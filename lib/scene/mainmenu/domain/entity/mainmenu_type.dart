@@ -5,6 +5,7 @@ enum MainMenuType {
   createBill,
   manageBill,
   manageFlower,
+  manageCategory,
   editCustomer,
   deleteCustomer
 }
@@ -22,6 +23,8 @@ extension MainMenuTypeExtensions on MainMenuType {
         return "แก้ไขข้อมูลลูกค้า";
       case MainMenuType.deleteCustomer:
         return "ลบลูกค้า";
+      case MainMenuType.manageCategory:
+        return "จัดการหมวดหมู่";
     }
   }
 
@@ -37,6 +40,8 @@ extension MainMenuTypeExtensions on MainMenuType {
         return Icons.edit;
       case MainMenuType.deleteCustomer:
         return Icons.delete;
+      case MainMenuType.manageCategory:
+        return Icons.category;
     }
   }
 }

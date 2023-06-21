@@ -1,3 +1,4 @@
+import 'package:flowerstore/scene/billhistory/presentation/screen/bill_history_screen.dart';
 import 'package:flowerstore/scene/createbill/presentation/screen/createbill_screen.dart';
 import 'package:flowerstore/scene/dashboard/data/model/customer.dart';
 import 'package:flowerstore/scene/dashboard/presentation/bloc/dashboard_bloc.dart';
@@ -5,6 +6,8 @@ import 'package:flowerstore/scene/mainmenu/domain/entity/mainmenu_type.dart';
 import 'package:flowerstore/scene/mainmenu/presentation/bloc/mainmenu_bloc.dart';
 import 'package:flowerstore/scene/mainmenu/presentation/widget/mainmenu_item.dart';
 import 'package:flowerstore/scene/mainmenu/presentation/widget/patch_customer_dialog.dart';
+import 'package:flowerstore/scene/managecategory/presentation/screen/manage_category_screen.dart';
+import 'package:flowerstore/scene/manageproduct/presentation/screen/manage_product_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -56,7 +59,7 @@ class MainMenuScreen extends StatelessWidget {
                   type: MainMenuType.createBill,
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => CreateBillScreen(),
+                      builder: (context) => CreateBillScreen(customer),
                     ),
                   ),
                 ),
@@ -64,7 +67,7 @@ class MainMenuScreen extends StatelessWidget {
                   type: MainMenuType.manageBill,
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => CreateBillScreen(),
+                      builder: (context) => BillHistoryScreen(customer),
                     ),
                   ),
                 ),
@@ -72,7 +75,15 @@ class MainMenuScreen extends StatelessWidget {
                   type: MainMenuType.manageFlower,
                   onTap: () => Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => CreateBillScreen(),
+                      builder: (context) => ManageProductScreen(customer),
+                    ),
+                  ),
+                ),
+                MainMenuItem(
+                  type: MainMenuType.manageCategory,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => ManageCategoryScreen(customer),
                     ),
                   ),
                 ),
