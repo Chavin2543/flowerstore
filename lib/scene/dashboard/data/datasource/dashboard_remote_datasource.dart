@@ -25,7 +25,7 @@ class DashboardRemoteDataSourceImpl implements DashboardRemoteDataSource {
 
       if (response.statusCode == 200) {
         final jsonResponse = response.data;
-        final customersData = jsonResponse['Customers'] as List<dynamic>;
+        final customersData = jsonResponse['customers'] as List<dynamic>;
 
         return customersData
             .map<Customer>((json) => Customer.fromJson(json))

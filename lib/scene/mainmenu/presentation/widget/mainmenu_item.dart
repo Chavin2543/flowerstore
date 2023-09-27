@@ -36,6 +36,8 @@ class _MainMenuItemState extends State<MainMenuItem> {
               borderRadius: BorderRadius.circular(24),
             ),
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Icon(
                   widget.type.icon,

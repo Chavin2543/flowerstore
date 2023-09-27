@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flowerstore/scene/billhistory/datasource/invoice_remote_datasource.dart';
+import 'package:flowerstore/scene/billhistory/presentation/bloc/invoice_bloc.dart';
 import 'package:flowerstore/scene/createbill/data/datasource/category_remote_datasource.dart';
 import 'package:flowerstore/scene/createbill/data/datasource/product_remote_datasource.dart';
 import 'package:flowerstore/scene/createbill/presentation/bloc/category/category_bloc.dart';
@@ -14,7 +16,9 @@ Future<void> inject() async {
   // Misc
   injector.registerFactory<Dio>(
     () => Dio.new(
-        BaseOptions(baseUrl: "http://numeric-region-387513.as.r.appspot.com/")),
+        BaseOptions(
+            baseUrl: "http://numeric-region-387513.as.r.appspot.com/",
+          headers: {"api-key": "e5f3f034-44c3-4abe-a6b6-22bdc34cd318"})),
   );
   // DataSources
   injector.registerLazySingleton<DashboardRemoteDataSource>(
@@ -32,6 +36,11 @@ Future<void> inject() async {
       injector(),
     ),
   );
+  injector.registerLazySingleton<InvoiceRemoteDataSource>(
+        () => InvoiceRemoteDataSourceImpl(
+      injector(),
+    ),
+  );
 
   // BLoC
   injector.registerFactory(
@@ -45,9 +54,18 @@ Future<void> inject() async {
     ),
   );
   injector.registerFactory(
-    () => ProductBloc(),
+    () => ProductBloc(
+      injector()
+    ),
   );
   injector.registerFactory(
-    () => CategoryBloc(),
+    () => CategoryBloc(
+      injector()
+    ),
+  );
+  injector.registerFactory(
+        () => InvoiceBloc(
+        injector()
+    ),
   );
 }

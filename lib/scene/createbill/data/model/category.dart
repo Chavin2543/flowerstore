@@ -1,28 +1,19 @@
 class Category {
   int id;
   String name;
-  int categoryId;
-  String categoryName;
-  double price;
-  String unit;
+  int customerId;
 
   Category({
     required this.id,
     required this.name,
-    required this.categoryId,
-    required this.categoryName,
-    required this.price,
-    required this.unit,
+    required this.customerId,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
     return Category(
       id: json['id'],
       name: json['name'],
-      categoryId: json['category_id'],
-      categoryName: json['category_name'],
-      price: json['price'].toDouble(),
-      unit: json['unit'],
+      customerId: json['customer_id'],
     );
   }
 }

@@ -8,7 +8,7 @@ abstract class ProductRemoteDataSource {
 
   Future<List<Product>> postProducts(AddProduct request);
 
-  Future<List<Product>> patchProducts(int id, PatchProduct request);
+  Future<List<Product>> patchProducts(PatchProduct request);
 
   Future<List<Product>> deleteProducts(int id);
 }
@@ -34,7 +34,7 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
         print('API request failed with status code: ${response.statusCode}');
       }
     } catch (error) {
-      print('Error: ${error.toString()}');
+      print('Product Error: ${error.toString()}');
     }
 
     return [];
@@ -80,10 +80,10 @@ class ProductRemoteDataSourceImpl implements ProductRemoteDataSource {
   }
 
   @override
-  Future<List<Product>> patchProducts(int id, PatchProduct request) async {
+  Future<List<Product>> patchProducts(PatchProduct request) async {
     try {
       final response = await dio.patch(
-        'products/$id',
+        'products/${request.id}',
         data: request.toJson(),
         options: Options(
           contentType: 'application/json',

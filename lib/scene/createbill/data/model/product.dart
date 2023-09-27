@@ -2,15 +2,15 @@ class Product {
   int id;
   String name;
   int categoryId;
-  String categoryName;
   double price;
   String unit;
+  int customerId;
 
   Product({
     required this.id,
     required this.name,
     required this.categoryId,
-    required this.categoryName,
+    required this.customerId,
     required this.price,
     required this.unit,
   });
@@ -20,7 +20,7 @@ class Product {
       id: json['id'],
       name: json['name'],
       categoryId: json['category_id'],
-      categoryName: json['category_name'],
+      customerId: json['customer_id'],
       price: json['price'].toDouble(),
       unit: json['unit'],
     );

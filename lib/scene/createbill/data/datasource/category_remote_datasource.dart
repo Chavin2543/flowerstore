@@ -25,7 +25,7 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
 
       if (response.statusCode == 200) {
         final jsonResponse = response.data;
-        final productsData = jsonResponse['Categories'] as List<dynamic>;
+        final productsData = jsonResponse['categories'] as List<dynamic>;
 
         return productsData
             .map<Category>((json) => Category.fromJson(json))

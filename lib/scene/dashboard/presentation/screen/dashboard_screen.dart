@@ -1,4 +1,7 @@
 import 'package:flowerstore/base/ui/textfield/base_textfield.dart';
+import 'package:flowerstore/scene/billhistory/presentation/bloc/invoice_bloc.dart';
+import 'package:flowerstore/scene/createbill/presentation/bloc/category/category_bloc.dart';
+import 'package:flowerstore/scene/createbill/presentation/bloc/product/product_bloc.dart';
 import 'package:flowerstore/scene/dashboard/data/model/customer.dart';
 import 'package:flowerstore/scene/dashboard/presentation/bloc/dashboard_bloc.dart';
 import 'package:flowerstore/scene/dashboard/presentation/widget/add_customer_dialog.dart';
@@ -83,21 +86,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         name: filteredSearchText[position].name,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(
-                              builder: (navigatorContext) => MultiBlocProvider(
-                                    providers: [
-                                      BlocProvider.value(
-                                        value: BlocProvider.of<MainmenuBloc>(
-                                            context),
-                                      ),
-                                      BlocProvider.value(
-                                        value: BlocProvider.of<DashboardBloc>(
-                                            context),
-                                      ),
-                                    ],
-                                    child: MainMenuScreen(
-                                      customer: filteredSearchText[position],
-                                    ),
-                                  )),
+                            builder: (navigatorContext) => MultiBlocProvider(
+                              providers: [
+                                BlocProvider.value(
+                                  value: BlocProvider.of<MainmenuBloc>(context),
+                                ),
+                                BlocProvider.value(
+                                  value:
+                                      BlocProvider.of<DashboardBloc>(context),
+                                ),
+                                BlocProvider.value(
+                                  value:
+                                  BlocProvider.of<ProductBloc>(context),
+                                ),
+                                BlocProvider.value(
+                                  value:
+                                  BlocProvider.of<CategoryBloc>(context),
+                                ),
+                                BlocProvider.value(
+                                  value:
+                                  BlocProvider.of<InvoiceBloc>(context),
+                                ),
+                              ],
+                              child: MainMenuScreen(
+                                customer: filteredSearchText[position],
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       itemCount: filteredSearchText.length,

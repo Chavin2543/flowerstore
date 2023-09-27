@@ -5,26 +5,26 @@ enum MainMenuType {
   createBill,
   manageBill,
   manageFlower,
-  manageCategory,
   editCustomer,
-  deleteCustomer
+  deleteCustomer,
+  report,
 }
 
 extension MainMenuTypeExtensions on MainMenuType {
   String get title {
     switch (this) {
       case MainMenuType.createBill:
-        return "สร้างบิล";
+        return "จัดทำบิล";
       case MainMenuType.manageBill:
-        return "จัดการบิล";
+        return "ประวัติบิล";
       case MainMenuType.manageFlower:
-        return "จัดการดอกไม้";
+        return "กำหนดราคา";
       case MainMenuType.editCustomer:
         return "แก้ไขข้อมูลลูกค้า";
       case MainMenuType.deleteCustomer:
         return "ลบลูกค้า";
-      case MainMenuType.manageCategory:
-        return "จัดการหมวดหมู่";
+      case MainMenuType.report:
+        return "รายงาน";
     }
   }
 
@@ -32,16 +32,16 @@ extension MainMenuTypeExtensions on MainMenuType {
     switch (this) {
       case MainMenuType.createBill:
         return Icons.money;
-      case MainMenuType.manageBill:
-        return Icons.history;
       case MainMenuType.manageFlower:
         return Icons.energy_savings_leaf;
       case MainMenuType.editCustomer:
         return Icons.edit;
       case MainMenuType.deleteCustomer:
         return Icons.delete;
-      case MainMenuType.manageCategory:
-        return Icons.category;
+      case MainMenuType.report:
+        return Icons.info_rounded;
+      case MainMenuType.manageBill:
+        return Icons.history;
     }
   }
 }
