@@ -1,13 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flowerstore/scene/billhistory/datasource/invoice_remote_datasource.dart';
-import 'package:flowerstore/scene/billhistory/presentation/bloc/invoice_bloc.dart';
-import 'package:flowerstore/scene/createbill/data/datasource/category_remote_datasource.dart';
-import 'package:flowerstore/scene/createbill/data/datasource/product_remote_datasource.dart';
-import 'package:flowerstore/scene/createbill/presentation/bloc/category/category_bloc.dart';
-import 'package:flowerstore/scene/createbill/presentation/bloc/product/product_bloc.dart';
-import 'package:flowerstore/scene/dashboard/data/datasource/dashboard_remote_datasource.dart';
-import 'package:flowerstore/scene/dashboard/presentation/bloc/dashboard_bloc.dart';
-import 'package:flowerstore/scene/mainmenu/presentation/bloc/mainmenu_bloc.dart';
+import 'package:flowerstore/data/datasource/category/category_datasource.dart';
+import 'package:flowerstore/data/datasource/customer/customer_datasource.dart';
+import 'package:flowerstore/data/datasource/invoice/invoice_datasource.dart';
+import 'package:flowerstore/data/datasource/product/product_datasource.dart';
+import 'package:flowerstore/presentation/bloc/analytic/analytic_bloc.dart';
+import 'package:flowerstore/presentation/bloc/customer/customer_bloc.dart';
+import 'package:flowerstore/presentation/bloc/invoice/invoice_bloc.dart';
+import 'package:flowerstore/presentation/bloc/category/category_bloc.dart';
+import 'package:flowerstore/presentation/bloc/product/product_bloc.dart';
 import 'package:get_it/get_it.dart';
 
 final injector = GetIt.asNewInstance();
@@ -15,57 +15,46 @@ final injector = GetIt.asNewInstance();
 Future<void> inject() async {
   // Misc
   injector.registerFactory<Dio>(
-    () => Dio.new(
-        BaseOptions(
-            baseUrl: "http://numeric-region-387513.as.r.appspot.com/",
-          headers: {"api-key": "e5f3f034-44c3-4abe-a6b6-22bdc34cd318"})),
+    () => Dio.new(BaseOptions(
+        baseUrl: "http://numeric-region-387513.as.r.appspot.com/",
+        headers: {"api-key": "e5f3f034-44c3-4abe-a6b6-22bdc34cd318"})),
   );
   // DataSources
-  injector.registerLazySingleton<DashboardRemoteDataSource>(
-    () => DashboardRemoteDataSourceImpl(
+  injector.registerLazySingleton<CustomerDataSource>(
+    () => CustomerDataSourceImpl(
       injector(),
     ),
   );
-  injector.registerLazySingleton<ProductRemoteDataSource>(
-    () => ProductRemoteDataSourceImpl(
+  injector.registerLazySingleton<ProductDatasource>(
+    () => ProductDatasourceImpl(
       injector(),
     ),
   );
-  injector.registerLazySingleton<CategoryRemoteDataSource>(
-    () => CategoryRemoteDataSourceImpl(
+  injector.registerLazySingleton<CategoryDataSource>(
+    () => CategoryDataSourceImpl(
       injector(),
     ),
   );
-  injector.registerLazySingleton<InvoiceRemoteDataSource>(
-        () => InvoiceRemoteDataSourceImpl(
+  injector.registerLazySingleton<InvoiceDataSource>(
+    () => InvoiceDataSourceImpl(
       injector(),
     ),
   );
 
   // BLoC
   injector.registerFactory(
-    () => DashboardBloc(
-      injector(),
-    ),
+    () => CustomerBloc(injector()),
   );
   injector.registerFactory(
-    () => MainmenuBloc(
-      injector(),
-    ),
+    () => ProductBloc(injector()),
   );
   injector.registerFactory(
-    () => ProductBloc(
-      injector()
-    ),
+    () => CategoryBloc(injector()),
   );
   injector.registerFactory(
-    () => CategoryBloc(
-      injector()
-    ),
+    () => InvoiceBloc(injector(), injector()),
   );
   injector.registerFactory(
-        () => InvoiceBloc(
-        injector()
-    ),
+    () => AnalyticBloc(injector()),
   );
 }

@@ -1,0 +1,3 @@
+class GetDepartmentRequest {
+  const GetDepartmentRequest();
+}

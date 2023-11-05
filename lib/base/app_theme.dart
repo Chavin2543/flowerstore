@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
-    primaryColor: const Color(0xFFB2A4FF),
+    primaryColor: const Color(0xFFFFFAF4),
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
-      primary: Color(0xFFB2A4FF),
-      onPrimary: Colors.white,
-      secondary: Color(0xFFFFB4B4),
+      primary: Color(0xFFFFFAF4),
+      onPrimary: Colors.black,
+      secondary: Color(0xFFE6CFB4),
       onSecondary: Colors.black,
       error: Colors.red,
       onError: Colors.white,
       background: Colors.white,
       onBackground: Colors.black,
-      surface: Color(0xFFFFDEB4),
+      surface: Color(0xFFE6CFB4),
       onSurface: Colors.black,
     ),
     highlightColor: const Color(0xFFFFDEB4),

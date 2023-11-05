@@ -1,0 +1,3 @@
+class GetCategoryRequest {
+  const GetCategoryRequest();
+}

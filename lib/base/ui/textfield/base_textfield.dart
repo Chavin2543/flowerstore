@@ -13,8 +13,9 @@ class BaseTextfield extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(32),
-        color: Colors.grey.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16),
+        color: Theme.of(context).colorScheme.primary,
+        border: Border.all(color: Theme.of(context).colorScheme.secondary)
       ),
       child: TextField(
         onChanged: (text) => onTextChange(text),

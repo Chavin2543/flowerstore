@@ -1,0 +1,3 @@
+class GetInvoiceRequest {
+  GetInvoiceRequest();
+}
