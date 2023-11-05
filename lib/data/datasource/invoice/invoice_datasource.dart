@@ -34,7 +34,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
   Future<List<Invoice>> getInvoice(GetInvoiceRequest request) async {
     try {
       final response = await dio.get('invoices');
-      if (response.statusCode == 200) {
+      if (response.statusCode! >= 200 && response.statusCode! <= 204) {
         final List<dynamic> invoiceData = response.data['Invoices'];
         return invoiceData
             .map<Invoice>((json) => Invoice.fromJson(json))
@@ -53,7 +53,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
     try {
       final response =
           await dio.get('invoices/?customer_id=${request.customerId}');
-      if (response.statusCode == 200) {
+      if (response.statusCode! >= 200 && response.statusCode! <= 204) {
         final List<dynamic> invoiceData = response.data['Invoices'];
         return invoiceData
             .map<Invoice>((json) => Invoice.fromJson(json))
@@ -73,7 +73,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
     try {
       final response =
           await dio.get('invoice-items?invoice_id=${request.invoiceId}');
-      if (response.statusCode == 200) {
+      if (response.statusCode! >= 200 && response.statusCode! <= 204) {
         final List<dynamic> invoiceItemData = response.data['InvoiceItems'];
         return invoiceItemData
             .map<InvoiceItem>((json) => InvoiceItem.fromJson(json))
@@ -95,7 +95,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
         options: Options(contentType: 'application/json'),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError(
             'DELETE request failed. Status code: ${response.statusCode}');
       }
@@ -114,7 +114,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
         options: Options(contentType: 'application/json'),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError(
             'DELETE request failed. Status code: ${response.statusCode}');
       }
@@ -129,6 +129,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
   Future<List<Invoice>> addInvoice(AddInvoiceRequest request) async {
     try {
       final int invoiceId = await createInvoice(request);
+      if (request.billItems.isEmpty) { return([]); }
       addInvoiceItems(AddInvoiceItemsRequest(invoiceId: invoiceId, billItem: request.billItems));
     } catch (error) {
       throw ErrorManager.handleAPIError(error);
@@ -157,7 +158,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
         options: Options(contentType: 'application/json'),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError(
             'POST request failed. Status code: ${response.statusCode}');
       }
@@ -175,7 +176,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
       options: Options(contentType: 'application/json'),
     );
 
-    if (response.statusCode != 200) {
+    if (response.statusCode! <= 200 && response.statusCode! >= 204) {
       throw APIError(
           'POST request failed. Status code: ${response.statusCode}');
     }
@@ -195,7 +196,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
       await deleteInvoiceItemByInvoiceId(DeleteInvoiceItemByInvoiceId(invoiceId: request.invoiceId));
       await addInvoiceItems(AddInvoiceItemsRequest(invoiceId: request.invoiceId, billItem: request.currentBillItem ?? []));
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError(
             'PATCH request failed. Status code: ${response.statusCode}');
       }

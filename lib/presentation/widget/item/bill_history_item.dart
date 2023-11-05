@@ -39,7 +39,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     decoration: BoxDecoration(border: Border.all()),
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
-                      widget.invoice.id.toString(),
+                      widget.invoice.invoiceId.toString(),
                       style: const TextStyle(fontSize: 20),
                     ),
                   ),

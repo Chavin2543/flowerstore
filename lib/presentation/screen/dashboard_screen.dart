@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flowerstore/data/datasource/customer/model/get_customer_request.dart';
+import 'package:flowerstore/data/datasource/department/model/get_department_request.dart';
 import 'package:flowerstore/helper/customer_store.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:flowerstore/presentation/screen/summary_screen.dart';
 
 import '../bloc/analytic/analytic_bloc.dart';
 import '../bloc/category/category_bloc.dart';
+import '../bloc/department/department_bloc.dart';
 import '../bloc/invoice/invoice_bloc.dart';
 import '../bloc/product/product_bloc.dart';
 
@@ -110,7 +112,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return BlocConsumer<CustomerBloc, CustomerState>(
       listener: (context, state) {
         if (state is CustomerAdded) {
-          _showAddedToast();
+          _showAddedDialog();
         }
       },
       builder: (context, state) {
@@ -222,6 +224,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
           child: SummaryScreen(
             customer: customers,
@@ -235,6 +238,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     CustomerStore.setCustomerId(customer.id);
     CustomerStore.setCustomerName(customer.name);
 
+    BlocProvider.of<DepartmentBloc>(context).add(
+      GetDepartmentEvent(
+        request: const GetDepartmentRequest(),
+      ),
+    );
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (navigatorContext) => MultiBlocProvider(
@@ -244,6 +253,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
           child: MainMenuScreen(customer: customer),
         ),
@@ -251,15 +261,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void _showAddedToast() {
-    Fluttertoast.showToast(
-      msg: 'ลูกค้าถูกลบ',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black87,
-      textColor: Colors.white,
-      fontSize: 16.0,
+  void _showAddedDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('สำเร็จ'),
+          // You can change this to match your message title
+          content: Text('ลูกค้าถูกเพิ่ม'),
+          // Message you want to show
+          actions: <Widget>[
+            TextButton(
+              child: Text('ตกลง'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Dismiss the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

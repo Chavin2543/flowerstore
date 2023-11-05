@@ -22,7 +22,7 @@ class DepartmentPatched extends DepartmentState {}
 class DepartmentDeleted extends DepartmentState {}
 
 class DepartmentLoaded extends DepartmentState {
-  List<String> departments;
+  List<Department> departments;
 
   DepartmentLoaded(this.departments);
 

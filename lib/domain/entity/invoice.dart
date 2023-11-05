@@ -3,12 +3,14 @@ class Invoice {
   DateTime date;
   String total;
   int customerId;
+  int? invoiceId;
 
   Invoice({
     required this.id,
     required this.date,
     required this.total,
     required this.customerId,
+    required this.invoiceId,
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -19,6 +21,7 @@ class Invoice {
       total: json['total'],
       date: date,
       customerId: json['customer_id'],
+      invoiceId: json['invoice_id'],
     );
   }
 }

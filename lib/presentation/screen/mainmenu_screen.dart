@@ -1,6 +1,5 @@
 import 'package:flowerstore/data/datasource/customer/model/delete_customer_request.dart';
 import 'package:flowerstore/data/datasource/customer/model/get_customer_request.dart';
-import 'package:flowerstore/data/datasource/customer/model/patch_customer_request.dart';
 import 'package:flowerstore/helper/customer_store.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +11,7 @@ import '../../domain/entity/mainmenu_type.dart';
 import '../bloc/analytic/analytic_bloc.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/customer/customer_bloc.dart';
+import '../bloc/department/department_bloc.dart';
 import '../bloc/invoice/invoice_bloc.dart';
 import '../bloc/product/product_bloc.dart';
 import '../screen/analytic_screen.dart';
@@ -63,7 +63,10 @@ class MainMenuScreen extends StatelessWidget {
                 _buildMenuItem(
                     context,
                     MainMenuType.createBill,
-                    () => _navigateToCreateBillScreen(context),
+                    () async => _navigateToCreateBillScreen(
+                      context,
+                      await BlocProvider.of<InvoiceBloc>(context).generateInvoiceId()
+                    ),
                     largeButtonWidth),
                 _buildMenuItem(
                     context,
@@ -100,7 +103,8 @@ class MainMenuScreen extends StatelessWidget {
                 BlocListener<CustomerBloc, CustomerState>(
                   listener: (context, state) {
                     if (state is CustomerPatched) {
-                      Fluttertoast.showToast(msg: "ข้อมูลได้ถูกแก้แล้ว โปรดเข้าใหม่");
+                      Fluttertoast.showToast(
+                          msg: "ข้อมูลได้ถูกแก้แล้ว โปรดเข้าใหม่");
                       Navigator.pop(context);
                     }
                   },
@@ -128,7 +132,7 @@ class MainMenuScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToCreateBillScreen(BuildContext context) {
+  void _navigateToCreateBillScreen(BuildContext context, int displayInvoiceId) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (navigatorContext) => MultiBlocProvider(
@@ -138,8 +142,13 @@ class MainMenuScreen extends StatelessWidget {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
-          child: CreateBillScreen(customer, invoiceId: null),
+          child: CreateBillScreen(
+            customer,
+            invoiceId: null,
+            displayInvoiceId: displayInvoiceId,
+          ),
         ),
       ),
     );
@@ -155,6 +164,7 @@ class MainMenuScreen extends StatelessWidget {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
           child: BillHistoryScreen(customer),
         ),
@@ -172,6 +182,7 @@ class MainMenuScreen extends StatelessWidget {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
           child: ManageProductScreen(customer),
         ),

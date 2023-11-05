@@ -1,6 +1,7 @@
 import 'package:flowerstore/base/app_theme.dart';
 import 'package:flowerstore/presentation/bloc/analytic/analytic_bloc.dart';
 import 'package:flowerstore/presentation/bloc/customer/customer_bloc.dart';
+import 'package:flowerstore/presentation/bloc/department/department_bloc.dart';
 import 'package:flowerstore/presentation/bloc/invoice/invoice_bloc.dart';
 import 'package:flowerstore/presentation/bloc/category/category_bloc.dart';
 import 'package:flowerstore/presentation/bloc/product/product_bloc.dart';
@@ -33,6 +34,9 @@ class FlowerStore extends StatelessWidget {
           ),
           BlocProvider<AnalyticBloc>(
             create: (context) => di.injector<AnalyticBloc>(),
+          ),
+          BlocProvider<DepartmentBloc>(
+            create: (context) => di.injector<DepartmentBloc>(),
           ),
         ],
         child: const DashboardScreen(),

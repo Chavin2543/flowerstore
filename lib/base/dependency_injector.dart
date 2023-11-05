@@ -1,10 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flowerstore/data/datasource/category/category_datasource.dart';
 import 'package:flowerstore/data/datasource/customer/customer_datasource.dart';
+import 'package:flowerstore/data/datasource/department/department_datasource.dart';
 import 'package:flowerstore/data/datasource/invoice/invoice_datasource.dart';
 import 'package:flowerstore/data/datasource/product/product_datasource.dart';
 import 'package:flowerstore/presentation/bloc/analytic/analytic_bloc.dart';
 import 'package:flowerstore/presentation/bloc/customer/customer_bloc.dart';
+import 'package:flowerstore/presentation/bloc/department/department_bloc.dart';
 import 'package:flowerstore/presentation/bloc/invoice/invoice_bloc.dart';
 import 'package:flowerstore/presentation/bloc/category/category_bloc.dart';
 import 'package:flowerstore/presentation/bloc/product/product_bloc.dart';
@@ -40,6 +42,11 @@ Future<void> inject() async {
       injector(),
     ),
   );
+  injector.registerLazySingleton<DepartmentDataSource>(
+    () => DepartmentDataSourceImpl(
+      injector(),
+    ),
+  );
 
   // BLoC
   injector.registerFactory(
@@ -56,5 +63,8 @@ Future<void> inject() async {
   );
   injector.registerFactory(
     () => AnalyticBloc(injector()),
+  );
+  injector.registerFactory(
+    () => DepartmentBloc(injector()),
   );
 }

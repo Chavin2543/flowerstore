@@ -40,9 +40,13 @@ class _CreateBillItemState extends State<CreateBillItem> {
   void _onExit(ActionType actionType) => setState(() => _hoveringStates[actionType] = false);
 
   Widget _buildTextContainer(double width, String text) {
+    final double _commonHeight = 48;
+
     return Container(
       decoration: BoxDecoration(border: Border.all()),
       width: width,
+      height: _commonHeight, // Set the common height here
+      alignment: Alignment.center, // To center the text vertically and horizontally
       child: Text(
         text,
         style: Theme.of(context).textTheme.displayLarge,
@@ -57,6 +61,8 @@ class _CreateBillItemState extends State<CreateBillItem> {
       ActionType actionType,
       VoidCallback onPressed,
       ) {
+    final double _commonHeight = 48;
+
     return MouseRegion(
       onEnter: (_) => _onEnter(actionType),
       onExit: (_) => _onExit(actionType),
@@ -70,11 +76,18 @@ class _CreateBillItemState extends State<CreateBillItem> {
                 : Colors.transparent,
           ),
           width: width,
+          height: _commonHeight, // Set the common height here
           child: TextButton(
             onPressed: onPressed,
             child: Text(
               label,
-              style: Theme.of(context).textTheme.displayLarge,
+              style: Theme.of(context).textTheme.displayLarge?.copyWith(color: Colors.black), // Ensure text color is visible
+              textAlign: TextAlign.center,
+            ),
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero, // Remove padding to fill the container
+              primary: Colors.black, // Text color
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero), // Match the container border
             ),
           ),
         ),

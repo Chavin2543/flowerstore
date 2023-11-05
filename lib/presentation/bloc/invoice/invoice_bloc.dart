@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flowerstore/data/api_error.dart';
+import 'package:flowerstore/data/datasource/invoice/model/request/delete_invoice_request.dart';
 import 'package:meta/meta.dart';
 
 // Project imports:
@@ -38,6 +39,8 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         (event, emit) async => _onAddInvoiceEvent(event, emit));
     on<PatchInvoiceEvent>(
         (event, emit) async => _onPatchInvoiceEvent(event, emit));
+    on<DeleteInvoiceEvent>(
+            (event, emit) async => _onDeleteInvoiceEvent(event, emit));
   }
 
   _onGetInvoicesEvent(
@@ -123,13 +126,38 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     }
   }
 
+  _onDeleteInvoiceEvent(
+      DeleteInvoiceEvent event, Emitter<InvoiceState> emit) async {
+    final cacheState = state;
+
+    emit(InvoiceLoading());
+
+    try {
+      final response = await _dataSource.deleteInvoice(event.request);
+
+      emit(
+        InvoiceLoaded(
+            response
+                .where((element) =>
+            element.customerId == CustomerStore.getCustomerId())
+                .toList()
+        ),
+      );
+    } on APIError catch (error) {
+      emit(InvoiceError(message: error.message));
+
+      if (cacheState is InvoiceLoaded) {
+        emit(cacheState);
+      } else {
+        emit(InvoiceLoaded(const []));
+      }
+    }
+  }
+
   Future<List<BillItem>> getInitialInvoiceItem(int invoiceId) async {
-    List<InvoiceItem> response = await _dataSource.getInvoiceItemByInvoiceId(
-        GetInvoiceItemByInvoiceId(invoiceId: invoiceId));
-    List<BillItem> items =
-        await Future.wait(response.map((InvoiceItem invoiceItem) async {
-      Product product = await _productRemoteDataSource.getProductById(
-              GetProductByIdRequest(id: invoiceItem.product_id)) ??
+    List<InvoiceItem> response = await _dataSource.getInvoiceItemByInvoiceId(GetInvoiceItemByInvoiceId(invoiceId: invoiceId));
+    List<BillItem> items = await Future.wait(response.map((InvoiceItem invoiceItem) async {
+      Product product = await _productRemoteDataSource.getProductById(GetProductByIdRequest(id: invoiceItem.product_id)) ??
           Product(
             id: 0,
             name: "Unknown",
@@ -139,11 +167,20 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
             unit: "Unknown",
           );
 
-      BillItem billItem =
-          BillItem(quantity: invoiceItem.quantity, product: product);
+      BillItem billItem = BillItem(quantity: invoiceItem.quantity, product: product);
+
       return billItem;
     }).toList());
 
     return items;
+  }
+
+  Future<int> generateInvoiceId() async {
+    try {
+      final response = await _dataSource.getInvoice(GetInvoiceRequest());
+      return response.where((element) => element.customerId == CustomerStore.getCustomerId()).toList().length + 1;
+    } on APIError catch (error) {
+      return 0;
+    }
   }
 }

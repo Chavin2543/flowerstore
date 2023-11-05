@@ -4,13 +4,14 @@ import 'package:flowerstore/data/datasource/department/model/add_department_requ
 import 'package:flowerstore/data/datasource/department/model/delete_department_request.dart';
 import 'package:flowerstore/data/datasource/department/model/get_department_request.dart';
 import 'package:flowerstore/data/datasource/department/model/patch_department_request.dart';
+import 'package:flowerstore/domain/entity/department.dart';
 import 'package:flowerstore/helper/error_manager.dart';
 
 abstract class DepartmentDataSource {
-  Future<List<String>> getDepartment(GetDepartmentRequest request);
-  Future<List<String>> addDepartment(AddDepartmentRequest request);
-  Future<List<String>> patchDepartment(PatchDepartmentRequest request);
-  Future<List<String>> deleteDepartment(DeleteDepartmentRequest request);
+  Future<List<Department>> getDepartment(GetDepartmentRequest request);
+  Future<List<Department>> addDepartment(AddDepartmentRequest request);
+  Future<List<Department>> patchDepartment(PatchDepartmentRequest request);
+  Future<List<Department>> deleteDepartment(DeleteDepartmentRequest request);
 }
 
 class DepartmentDataSourceImpl implements DepartmentDataSource {
@@ -19,11 +20,12 @@ class DepartmentDataSourceImpl implements DepartmentDataSource {
   DepartmentDataSourceImpl(this.dio);
 
   @override
-  Future<List<String>> getDepartment(GetDepartmentRequest request) async {
+  Future<List<Department>> getDepartment(GetDepartmentRequest request) async {
     try {
       final response = await dio.get('departments');
       if (response.statusCode == 200) {
-        return (response.data['Departments'] as List<String>)
+        return (response.data['departments'] as List<dynamic>)
+            .map<Department>((json) => Department.fromJson(json as Map<String, dynamic>))
             .toList();
       }
 
@@ -36,7 +38,7 @@ class DepartmentDataSourceImpl implements DepartmentDataSource {
   }
 
   @override
-  Future<List<String>> deleteDepartment(DeleteDepartmentRequest request) async {
+  Future<List<Department>> deleteDepartment(DeleteDepartmentRequest request) async {
     try {
       final response = await dio.delete(
         'departments/${request.departmentId}',
@@ -56,7 +58,7 @@ class DepartmentDataSourceImpl implements DepartmentDataSource {
   }
 
   @override
-  Future<List<String>> addDepartment(AddDepartmentRequest request) async {
+  Future<List<Department>> addDepartment(AddDepartmentRequest request) async {
     try {
       await dio.post(
         'departments',
@@ -73,7 +75,7 @@ class DepartmentDataSourceImpl implements DepartmentDataSource {
   }
 
   @override
-  Future<List<String>> patchDepartment(PatchDepartmentRequest request) async {
+  Future<List<Department>> patchDepartment(PatchDepartmentRequest request) async {
     try {
       final response = await dio.patch(
         'departments/${request.departmentId}',
@@ -93,7 +95,7 @@ class DepartmentDataSourceImpl implements DepartmentDataSource {
     return await refreshDepartment();
   }
 
-  Future<List<String>> refreshDepartment() async {
+  Future<List<Department>> refreshDepartment() async {
     return await getDepartment(const GetDepartmentRequest());
   }
 }

@@ -3,14 +3,14 @@ class Customer {
   String name;
   String phone;
   String address;
-  String departmentIds;
+  // List<int>? departmentIds;
 
   Customer({
     required this.id,
     required this.name,
     required this.phone,
     required this.address,
-    required this.departmentIds
+    // this.departmentIds
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
@@ -19,7 +19,9 @@ class Customer {
       name: json['name'],
       phone: json['phone'],
       address: json['address'],
-      departmentIds: json['department_ids'],
+      // departmentIds: json['department_ids'] != null
+      //     ? List<int>.from(json['department_ids'] as List)
+      //     : null,
     );
   }
 }

@@ -2,6 +2,7 @@ import 'package:flowerstore/domain/entity/bill_item.dart';
 
 class PatchInvoiceRequest {
   int invoiceId;
+  int? displayInvoiceId;
   String? date;
   double? total;
   int? customerId;
@@ -11,6 +12,7 @@ class PatchInvoiceRequest {
     required this.invoiceId,
     this.date,
     this.total,
+    this.displayInvoiceId,
     this.customerId,
     this.currentBillItem
   });
@@ -18,6 +20,7 @@ class PatchInvoiceRequest {
   Map<String, dynamic> toJson() {
     return {
       'total': total,
+      'invoice_id': displayInvoiceId,
     };
   }
 }

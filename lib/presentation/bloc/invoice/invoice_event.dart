@@ -41,3 +41,15 @@ class PatchInvoiceEvent implements InvoiceEvent {
   @override
   bool? get stringify => false;
 }
+
+class DeleteInvoiceEvent implements InvoiceEvent {
+  final DeleteInvoiceRequest request;
+
+  DeleteInvoiceEvent({required this.request});
+
+  @override
+  List<Object?> get props => [request];
+
+  @override
+  bool? get stringify => false;
+}

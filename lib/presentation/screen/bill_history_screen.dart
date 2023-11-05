@@ -1,12 +1,16 @@
+import 'package:flowerstore/data/datasource/invoice/model/request/delete_invoice_request.dart';
 import 'package:flowerstore/data/datasource/invoice/model/request/get_invoice_request.dart';
+import 'package:flowerstore/data/datasource/invoice/model/request/patch_invoice_request.dart';
 import 'package:flowerstore/domain/entity/customer.dart';
 import 'package:flowerstore/presentation/bloc/analytic/analytic_bloc.dart';
+import 'package:flowerstore/presentation/bloc/department/department_bloc.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flowerstore/presentation/widget/item/bill_history_item.dart';
 import 'package:flowerstore/presentation/screen/createbill_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entity/invoice.dart';
 import '../bloc/category/category_bloc.dart';
 import '../bloc/customer/customer_bloc.dart';
 import '../bloc/invoice/invoice_bloc.dart';
@@ -30,11 +34,11 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
   }
 
   void _fetchInvoices() {
-    BlocProvider.of<InvoiceBloc>(context)
-        .add(GetInvoicesEvent(request: GetInvoiceRequest(), shouldFilter: true));
+    BlocProvider.of<InvoiceBloc>(context).add(
+        GetInvoicesEvent(request: GetInvoiceRequest(), shouldFilter: true));
   }
 
-  void _navigateToCreateBillScreen(int invoiceId) {
+  void _navigateToCreateBillScreen(int invoiceId, int displayInvoiceId) {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (navigatorContext) => MultiBlocProvider(
@@ -44,8 +48,13 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
             BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
             BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
           ],
-          child: CreateBillScreen(widget.customer, invoiceId: invoiceId),
+          child: CreateBillScreen(
+            widget.customer,
+            invoiceId: invoiceId,
+            displayInvoiceId: displayInvoiceId,
+          ),
         ),
       ),
     );
@@ -81,10 +90,85 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
       padding: const EdgeInsets.only(top: 60),
       itemBuilder: (context, position) {
         return BillHistoryItem(state.invoices[position], () {
-          _navigateToCreateBillScreen(state.invoices[position].id);
+          // _navigateToCreateBillScreen(state.invoices[position].id, state.invoices[position].invoiceId ?? 0);
+          _showInvoiceOptionDialog(state.invoices[position]);
         });
       },
       itemCount: state.invoices.length,
+    );
+  }
+
+  // Method to show the invoice option dialog
+  void _showInvoiceOptionDialog(Invoice invoice) {
+    // Create a text editing controller
+    TextEditingController _invoiceIdController =
+        TextEditingController(text: invoice.invoiceId.toString());
+
+    // Show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: Text(
+            'จัดการบิลนี้',
+            style: Theme.of(context).textTheme.displayMedium,
+          ),
+          content: TextField(
+            controller: _invoiceIdController,
+            decoration: const InputDecoration(labelText: 'หมายเลขบิล (แก้ได้)'),
+            keyboardType: TextInputType.number,
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'ดูบิล',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _navigateToCreateBillScreen(invoice.id, invoice.invoiceId ?? 0);
+              },
+            ),
+            TextButton(
+              child: Text(
+                'แก้ไขหมายเลข',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+              onPressed: () {
+                BlocProvider.of<InvoiceBloc>(context).add(
+                  PatchInvoiceEvent(
+                    request: PatchInvoiceRequest(
+                      invoiceId: invoice.id,
+                      displayInvoiceId: int.parse(_invoiceIdController.text),
+                    ),
+                  ),
+                );
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text(
+                'ลบบิล',
+                style: Theme.of(context).textTheme.displayMedium,
+              ),
+              onPressed: () {
+                BlocProvider.of<InvoiceBloc>(context).add(
+                  DeleteInvoiceEvent(
+                    request: DeleteInvoiceRequest(invoiceId: invoice.id),
+                  ),
+                );
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: Text('ปิด'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

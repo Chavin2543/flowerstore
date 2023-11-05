@@ -1,7 +1,9 @@
 import 'package:flowerstore/data/datasource/invoice/model/request/add_invoice_request.dart';
+import 'package:flowerstore/data/datasource/invoice/model/request/get_invoice_request.dart';
 import 'package:flowerstore/data/datasource/invoice/model/request/patch_invoice_request.dart';
 import 'package:flowerstore/helper/customer_store.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
+import 'package:flowerstore/presentation/widget/dialog/department_selection_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flowerstore/data/datasource/category/model/request/get_category_request.dart';
@@ -18,11 +20,15 @@ import 'package:flowerstore/presentation/widget/dialog/custom_product_dialog.dar
 import 'package:flowerstore/presentation/widget/item/createbill_item.dart';
 import 'package:flowerstore/presentation/widget/section/prefill_item_section.dart';
 
+import '../bloc/department/department_bloc.dart';
+
 class CreateBillScreen extends StatefulWidget {
   final int? invoiceId;
+  final int displayInvoiceId;
   final Customer customer;
 
-  const CreateBillScreen(this.customer, {Key? key, this.invoiceId})
+  const CreateBillScreen(this.customer,
+      {Key? key, this.invoiceId, required this.displayInvoiceId})
       : super(key: key);
 
   @override
@@ -35,8 +41,8 @@ class CreateBillScreenState extends State<CreateBillScreen> {
 
   @override
   void initState() {
-    super.initState();
     _initializeData();
+    super.initState();
   }
 
   Future<void> _initializeData() async {
@@ -44,10 +50,31 @@ class CreateBillScreenState extends State<CreateBillScreen> {
         .add(GetCategoriesEvent(request: const GetCategoryRequest()));
     BlocProvider.of<ProductBloc>(context)
         .add(GetProductEvent(request: GetProductRequest()));
+    BlocProvider.of<InvoiceBloc>(context).add(
+      GetInvoicesEvent(
+        request: GetInvoiceRequest(),
+        shouldFilter: true,
+      ),
+    );
 
     if (widget.invoiceId != null) {
       currentBillItems = await BlocProvider.of<InvoiceBloc>(context)
           .getInitialInvoiceItem(widget.invoiceId!);
+    } else {
+      final customerId = CustomerStore.getCustomerId();
+
+      if (customerId != null) {
+        BlocProvider.of<InvoiceBloc>(context).add(
+          AddInvoicesEvent(
+            request: AddInvoiceRequest(
+              total: 0,
+              customerId: customerId,
+              invoiceId: widget.displayInvoiceId,
+              billItems: [],
+            ),
+          ),
+        );
+      }
     }
 
     setState(() => isLoading = false);
@@ -57,8 +84,9 @@ class CreateBillScreenState extends State<CreateBillScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text("สร้างบิล", style: Theme.of(context).textTheme.displayLarge),
+        title: Text(
+            "สร้างบิลที่ ${widget.displayInvoiceId} ของ ${CustomerStore.getCustomerName()}",
+            style: Theme.of(context).textTheme.displayLarge),
         actions: [_buildRefreshButton()],
       ),
       body: isLoading ? _buildLoadingIndicator() : _buildBillScreenBody(),
@@ -130,83 +158,78 @@ class CreateBillScreenState extends State<CreateBillScreen> {
   void _handleContinue() async {
     final selectedDepartment = await _showDepartmentSelectionDialog();
     if (selectedDepartment != null) {
-      _navigateToPrintScreen();
+      _navigateToPrintScreen(selectedDepartment);
     }
   }
 
   Future<String?> _showDepartmentSelectionDialog() {
     return showDialog<String>(
       context: context,
-      builder: (navigatorContext) =>
-          _buildDepartmentSelectionDialog(navigatorContext),
-    );
-  }
-
-  AlertDialog _buildDepartmentSelectionDialog(BuildContext navigatorContext) {
-    return AlertDialog(
-      title: const Text('เลือกแผนก'),
-      content: _buildDepartmentDropdown(),
-      actions: _buildDialogActions(navigatorContext),
-    );
-  }
-
-  DropdownButton<String> _buildDepartmentDropdown() {
-    const departments = ['HR', 'Engineering', 'Marketing', 'Sales'];
-    String? selectedDepartment = departments.first;
-
-    return DropdownButton<String>(
-      isExpanded: true,
-      value: selectedDepartment,
-      items: departments
-          .map((value) =>
-              DropdownMenuItem<String>(value: value, child: Text(value)))
-          .toList(),
-      onChanged: (value) => setState(() => selectedDepartment = value),
-    );
-  }
-
-  List<Widget> _buildDialogActions(BuildContext navigatorContext) {
-    return [
-      ElevatedButton(
-        onPressed: () => _completeDepartmentSelection(navigatorContext),
-        child: const Text('ต่อไป'),
+      builder: (navigatorContext) => _buildDepartmentSelectionDialog(
+        context,
       ),
-      ElevatedButton(
-        onPressed: () => Navigator.of(context).pop(),
-        child: const Text('ยกเลิก'),
+    );
+  }
+
+  MultiBlocProvider _buildDepartmentSelectionDialog(
+      BuildContext navigatorContext) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
+      ],
+      child: DepartmentSelectionDialog(
+        onSelect: (String department) {
+          Navigator.of(navigatorContext).pop(department);
+        },
       ),
-    ];
+    );
   }
 
-  void _completeDepartmentSelection(BuildContext navigatorContext) {
-    Navigator.of(navigatorContext).pop();
-    _navigateToPrintScreen();
-  }
-
-  void _navigateToPrintScreen() {
+  void _navigateToPrintScreen(String department) {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
     final invoiceId = widget.invoiceId;
+
+    if (total == 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('แจ้งเตือน'),
+            content: const Text('โปรดใส่สินค้าอย่างน้อย 1 ชิ้น'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('ตกลง'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
 
     if (customerId != null) {
       if (invoiceId != null) {
         BlocProvider.of<InvoiceBloc>(context).add(
           PatchInvoiceEvent(
             request: PatchInvoiceRequest(
-              total: total,
-              customerId: customerId,
-              invoiceId: invoiceId,
-              currentBillItem: currentBillItems
-            ),
+                total: total,
+                customerId: customerId,
+                invoiceId: invoiceId,
+                currentBillItem: currentBillItems),
           ),
         );
       } else {
         BlocProvider.of<InvoiceBloc>(context).add(
-          AddInvoicesEvent(
-            request: AddInvoiceRequest(
+          PatchInvoiceEvent(
+            request: PatchInvoiceRequest(
               total: total,
               customerId: customerId,
-              billItems: currentBillItems,
+              currentBillItem: currentBillItems,
+              invoiceId: widget.displayInvoiceId,
             ),
           ),
         );

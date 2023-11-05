@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flowerstore/data/datasource/department/department_datasource.dart';
+import 'package:flowerstore/domain/entity/department.dart';
 import '../../../data/api_error.dart';
 import '../../../data/datasource/department/model/delete_department_request.dart';
 
@@ -119,7 +120,7 @@ class DepartmentBloc extends Bloc<DepartmentEvent, DepartmentState> {
       emit(
         DepartmentLoaded(
           response
-              .where((element) => element.contains(event.searchText))
+              .where((element) => element.name.contains(event.searchText))
               .toList(),
         ),
       );

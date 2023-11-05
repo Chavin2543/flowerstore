@@ -24,7 +24,7 @@ class CategoryDataSourceImpl implements CategoryDataSource {
   Future<List<Category>> getCategory(GetCategoryRequest request) async {
     try {
       final response = await dio.get('categories');
-      if (response.statusCode == 200) {
+      if (response.statusCode! >= 200 && response.statusCode! <= 204) {
         return (response.data['categories'] as List)
             .map<Category>((json) => Category.fromJson(json))
             .toList();
@@ -48,7 +48,7 @@ class CategoryDataSourceImpl implements CategoryDataSource {
         ),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError('DELETE request failed with status code: ${response.statusCode}');
       }
     } catch (error) {
@@ -86,7 +86,7 @@ class CategoryDataSourceImpl implements CategoryDataSource {
         ),
       );
 
-      if (response.statusCode != 200) {
+      if (response.statusCode! <= 200 && response.statusCode! >= 204) {
         throw APIError('PATCH request failed with status code: ${response.statusCode}');
       }
     } catch (error) {
@@ -97,6 +97,6 @@ class CategoryDataSourceImpl implements CategoryDataSource {
   }
 
   Future<List<Category>> refreshCategory() async {
-    return await getCategory(GetCategoryRequest());
+    return await getCategory(const GetCategoryRequest());
   }
 }
