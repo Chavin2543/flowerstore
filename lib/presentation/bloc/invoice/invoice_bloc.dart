@@ -79,14 +79,9 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
 
     try {
       final response = await _dataSource.addInvoice(event.request);
-      emit(
-        InvoiceLoaded(
-          response
-              .where((element) =>
-                  element.customerId == CustomerStore.getCustomerId())
-              .toList()
-        ),
-      );
+      emit(InvoiceCreated(invoiceId: response));
+
+      add(GetInvoicesEvent(request: GetInvoiceRequest(), shouldFilter: true));
     } on APIError catch (error) {
       emit(InvoiceError(message: error.message));
 

@@ -16,7 +16,7 @@ import '../../api_error.dart';
 
 abstract class InvoiceDataSource {
   Future<List<Invoice>> getInvoice(GetInvoiceRequest request);
-  Future<List<Invoice>> addInvoice(AddInvoiceRequest request);
+  Future<int> addInvoice(AddInvoiceRequest request);
   Future<List<Invoice>> patchInvoice(PatchInvoiceRequest request);
   Future<List<Invoice>> deleteInvoice(DeleteInvoiceRequest request);
   Future<List<Invoice>> deleteInvoiceItemByInvoiceId(DeleteInvoiceItemByInvoiceId request);
@@ -126,16 +126,15 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
   }
 
   @override
-  Future<List<Invoice>> addInvoice(AddInvoiceRequest request) async {
+  Future<int> addInvoice(AddInvoiceRequest request) async {
     try {
       final int invoiceId = await createInvoice(request);
-      if (request.billItems.isEmpty) { return([]); }
+      if (request.billItems.isEmpty) { return invoiceId; }
       addInvoiceItems(AddInvoiceItemsRequest(invoiceId: invoiceId, billItem: request.billItems));
+      return invoiceId;
     } catch (error) {
       throw ErrorManager.handleAPIError(error);
     }
-
-    return await refreshInvoice();
   }
 
   Future<void> addInvoiceItems(AddInvoiceItemsRequest request) async {

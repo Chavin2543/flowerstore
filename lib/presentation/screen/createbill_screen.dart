@@ -38,6 +38,7 @@ class CreateBillScreen extends StatefulWidget {
 class CreateBillScreenState extends State<CreateBillScreen> {
   List<BillItem> currentBillItems = [];
   bool isLoading = true;
+  int currentInvoiceId = 0;
 
   @override
   void initState() {
@@ -46,10 +47,8 @@ class CreateBillScreenState extends State<CreateBillScreen> {
   }
 
   Future<void> _initializeData() async {
-    BlocProvider.of<CategoryBloc>(context)
-        .add(GetCategoriesEvent(request: const GetCategoryRequest()));
-    BlocProvider.of<ProductBloc>(context)
-        .add(GetProductEvent(request: GetProductRequest()));
+    BlocProvider.of<CategoryBloc>(context).add(GetCategoriesEvent(request: const GetCategoryRequest()));
+    BlocProvider.of<ProductBloc>(context).add(GetProductEvent(request: GetProductRequest()));
     BlocProvider.of<InvoiceBloc>(context).add(
       GetInvoicesEvent(
         request: GetInvoiceRequest(),
@@ -58,8 +57,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
     );
 
     if (widget.invoiceId != null) {
-      currentBillItems = await BlocProvider.of<InvoiceBloc>(context)
-          .getInitialInvoiceItem(widget.invoiceId!);
+      currentBillItems = await BlocProvider.of<InvoiceBloc>(context).getInitialInvoiceItem(widget.invoiceId!);
     } else {
       final customerId = CustomerStore.getCustomerId();
 
@@ -89,7 +87,11 @@ class CreateBillScreenState extends State<CreateBillScreen> {
             style: Theme.of(context).textTheme.displayLarge),
         actions: [_buildRefreshButton()],
       ),
-      body: isLoading ? _buildLoadingIndicator() : _buildBillScreenBody(),
+      body: BlocListener<InvoiceBloc, InvoiceState>(listener: (context, state) {
+        if (state is InvoiceCreated) {
+          currentInvoiceId = state.invoiceId;
+        }
+      }, child: isLoading ? _buildLoadingIndicator() : _buildBillScreenBody(),),
     );
   }
 
@@ -188,7 +190,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
   void _navigateToPrintScreen(String department) {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
-    final invoiceId = widget.invoiceId;
+    final invoiceId = currentInvoiceId;
 
     if (total == 0) {
       showDialog(
@@ -216,20 +218,11 @@ class CreateBillScreenState extends State<CreateBillScreen> {
         BlocProvider.of<InvoiceBloc>(context).add(
           PatchInvoiceEvent(
             request: PatchInvoiceRequest(
-                total: total,
-                customerId: customerId,
-                invoiceId: invoiceId,
-                currentBillItem: currentBillItems),
-          ),
-        );
-      } else {
-        BlocProvider.of<InvoiceBloc>(context).add(
-          PatchInvoiceEvent(
-            request: PatchInvoiceRequest(
               total: total,
               customerId: customerId,
               currentBillItem: currentBillItems,
-              invoiceId: widget.displayInvoiceId,
+              invoiceId: invoiceId,
+              displayInvoiceId: widget.displayInvoiceId
             ),
           ),
         );

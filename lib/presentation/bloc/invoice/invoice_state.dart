@@ -19,7 +19,14 @@ class InvoicePatched extends InvoiceState { }
 
 class InvoiceDeleted extends InvoiceState { }
 
-class InvoiceCreated extends InvoiceState { }
+class InvoiceCreated extends InvoiceState {
+  int invoiceId;
+
+  InvoiceCreated({required this.invoiceId});
+
+  @override
+  List<Object?> get props => [invoiceId];
+}
 
 class InvoiceLoaded extends InvoiceState {
   List<Invoice> invoices;

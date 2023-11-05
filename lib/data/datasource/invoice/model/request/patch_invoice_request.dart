@@ -19,7 +19,7 @@ class PatchInvoiceRequest {
 
   Map<String, dynamic> toJson() {
     return {
-      'total': total,
+      'total': total.toString(),
       'invoice_id': displayInvoiceId,
     };
   }

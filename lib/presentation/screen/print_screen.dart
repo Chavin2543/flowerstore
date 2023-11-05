@@ -57,7 +57,7 @@ class _PrintScreenState extends State<PrintScreen> {
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              pw.Image(pw.MemoryImage(imageBytes)),
+              // pw.Image(pw.MemoryImage(imageBytes)),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
