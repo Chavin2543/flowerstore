@@ -139,6 +139,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
                   PatchInvoiceEvent(
                     request: PatchInvoiceRequest(
                       invoiceId: invoice.id,
+                      total: double.parse(invoice.total),
                       displayInvoiceId: int.parse(_invoiceIdController.text),
                     ),
                   ),
