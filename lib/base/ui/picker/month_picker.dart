@@ -11,7 +11,7 @@ class MonthPickerButton extends StatefulWidget {
 
 class _MonthPickerButtonState extends State<MonthPickerButton> {
   int startMonth = 1;
-  int endMonth = 12;
+  int endMonth = DateTime.now().month;
   int startYear = DateTime.now().year;
   int endYear = DateTime.now().year;
 
@@ -35,14 +35,14 @@ class _MonthPickerButtonState extends State<MonthPickerButton> {
             endYear = picked[2];
             endMonth = picked[3];
           });
-          widget.onMonthYearRangePicked(startYear, startMonth, endYear, endMonth);
+          widget.onMonthYearRangePicked(
+              startYear, startMonth, endYear, endMonth);
         }
       },
       child: const Text('เลือกช่วงเดือน'),
     );
   }
 }
-
 
 class MonthPickerDialog extends StatefulWidget {
   final int initialStartYear;
@@ -68,8 +68,18 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
   late int endYear;
   late int endMonth;
   final thaiMonths = [
-    'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
-    'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    'มกราคม',
+    'กุมภาพันธ์',
+    'มีนาคม',
+    'เมษายน',
+    'พฤษภาคม',
+    'มิถุนายน',
+    'กรกฎาคม',
+    'สิงหาคม',
+    'กันยายน',
+    'ตุลาคม',
+    'พฤศจิกายน',
+    'ธันวาคม'
   ];
 
   @override
@@ -94,7 +104,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
             value: startYear,
             items: List.generate(
               10,
-                  (index) => DropdownMenuItem(
+              (index) => DropdownMenuItem(
                 value: DateTime.now().year - index,
                 child: Text('${DateTime.now().year - index}'),
               ),
@@ -105,7 +115,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
             value: startMonth,
             items: List.generate(
               12,
-                  (index) => DropdownMenuItem(
+              (index) => DropdownMenuItem(
                 value: index + 1,
                 child: Text(thaiMonths[index]),
               ),
@@ -117,7 +127,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
             value: endYear,
             items: List.generate(
               10,
-                  (index) => DropdownMenuItem(
+              (index) => DropdownMenuItem(
                 value: DateTime.now().year - index,
                 child: Text('${DateTime.now().year - index}'),
               ),
@@ -128,7 +138,7 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
             value: endMonth,
             items: List.generate(
               12,
-                  (index) => DropdownMenuItem(
+              (index) => DropdownMenuItem(
                 value: index + 1,
                 child: Text(thaiMonths[index]),
               ),
@@ -139,7 +149,8 @@ class _MonthPickerDialogState extends State<MonthPickerDialog> {
       ),
       actions: [
         ElevatedButton(
-          onPressed: () => Navigator.of(context).pop([startYear, startMonth, endYear, endMonth]),
+          onPressed: () => Navigator.of(context)
+              .pop([startYear, startMonth, endYear, endMonth]),
           child: const Text('ตกลง'),
         ),
       ],

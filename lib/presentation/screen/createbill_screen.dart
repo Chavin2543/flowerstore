@@ -3,6 +3,7 @@ import 'package:flowerstore/data/datasource/invoice/model/request/get_invoice_re
 import 'package:flowerstore/data/datasource/invoice/model/request/patch_invoice_request.dart';
 import 'package:flowerstore/helper/customer_store.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
+import 'package:flowerstore/presentation/widget/dialog/company_selection_dialog.dart';
 import 'package:flowerstore/presentation/widget/dialog/department_selection_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -58,6 +59,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
 
     if (widget.invoiceId != null) {
       currentBillItems = await BlocProvider.of<InvoiceBloc>(context).getInitialInvoiceItem(widget.invoiceId!);
+      currentInvoiceId = widget.invoiceId!;
     } else {
       final customerId = CustomerStore.getCustomerId();
 
@@ -165,6 +167,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
 
   void _handleContinue() async {
     final selectedDepartment = await _showDepartmentSelectionDialog();
+    final selectedCompany = await _showCompanySelectionDialog();
     if (selectedDepartment != null) {
       _navigateToPrintScreen(selectedDepartment);
     }
@@ -174,6 +177,15 @@ class CreateBillScreenState extends State<CreateBillScreen> {
     return showDialog<String>(
       context: context,
       builder: (navigatorContext) => _buildDepartmentSelectionDialog(
+        context,
+      ),
+    );
+  }
+
+  Future<String?> _showCompanySelectionDialog() {
+    return showDialog<String>(
+      context: context,
+      builder: (navigatorContext) => _buildCompanySelectionDialog(
         context,
       ),
     );
@@ -190,6 +202,15 @@ class CreateBillScreenState extends State<CreateBillScreen> {
           Navigator.of(navigatorContext).pop(department);
         },
       ),
+    );
+  }
+
+  CompanySelectionDialog _buildCompanySelectionDialog(
+      BuildContext navigatorContext) {
+    return CompanySelectionDialog(
+      onSelect: (String company) {
+        Navigator.of(navigatorContext).pop(company);
+      },
     );
   }
 
