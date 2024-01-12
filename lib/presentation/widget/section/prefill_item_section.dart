@@ -48,18 +48,24 @@ class _PrefillItemSectionState extends State<PrefillItemSection> {
         color: Theme.of(context).colorScheme.primary,
         border: Border.all(color: Colors.black),
       ),
-      height: MediaQuery.of(context).size.height * 0.4,
+      height: MediaQuery.of(context).size.height * 0.405,
       width: constraints.maxWidth / 2,
       child: BlocBuilder<CategoryBloc, CategoryState>(
         builder: (context, state) {
           if (state is CategoriesLoaded) {
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  _buildCategorySearchField(),
-                  _buildCategoryList(state),
-                ],
-              ),
+            return Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  child: _buildCategorySearchField(),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  child: SingleChildScrollView(
+                    child: _buildCategoryList(state),
+                  ),
+                ),
+              ],
             );
           } else {
             return const LoadingScreen();
@@ -73,21 +79,27 @@ class _PrefillItemSectionState extends State<PrefillItemSection> {
       BuildContext context, BoxConstraints constraints) {
     return Container(
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.secondary,
-          border: Border.all(color: Colors.black)),
-      height: MediaQuery.of(context).size.height * 0.4,
+        color: Theme.of(context).colorScheme.secondary,
+        border: Border.all(color: Colors.black),
+      ),
+      height: MediaQuery.of(context).size.height * 0.405,
       width: constraints.maxWidth / 2,
       child: BlocBuilder<ProductBloc, ProductState>(
         builder: (context, state) {
           if (state is ProductsLoaded) {
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  _buildProductSearchField(),
-                  _buildProductList(state),
-                ],
-              ),
+            return Column(
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  child: _buildProductSearchField(),
+                ),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  child: SingleChildScrollView(
+                    child: _buildProductList(state),
+                  ),
+                ),
+              ],
             );
           } else {
             return const LoadingScreen();
@@ -102,7 +114,7 @@ class _PrefillItemSectionState extends State<PrefillItemSection> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
           hintText: "ค้นหาหมวดหมู่",
-          hintStyle: Theme.of(context).textTheme.displayLarge),
+          hintStyle: Theme.of(context).textTheme.bodyLarge),
       controller: _categorySearchController,
       onChanged: (text) {
         BlocProvider.of<CategoryBloc>(context).add(QueryCategoryEvent(text));
@@ -115,7 +127,7 @@ class _PrefillItemSectionState extends State<PrefillItemSection> {
       decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
           hintText: "ค้นหาสินค้า",
-          hintStyle: Theme.of(context).textTheme.displayLarge),
+          hintStyle: Theme.of(context).textTheme.bodyLarge),
       controller: _productSearchController,
       onChanged: (text) {
         BlocProvider.of<ProductBloc>(context).add(
@@ -142,6 +154,7 @@ class _PrefillItemSectionState extends State<PrefillItemSection> {
   Widget _buildProductList(ProductsLoaded state) {
     return ListView.builder(
       shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       itemBuilder: (context, position) {
         return ProductItem(
           name: state.products[position].name,

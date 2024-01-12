@@ -55,35 +55,40 @@ class _ManageCategoryItemState extends State<ManageCategoryItem> {
                     width: boxConstraints.maxWidth * 0.6,
                     child: Text(
                       widget.category.name,
-                      style: Theme.of(context).textTheme.displayLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    border: Border.all(),
-                  ),
-                  width: boxConstraints.maxWidth * 0.2,
-                  child: TextButton(
-                      onPressed: widget.onDelete,
+                GestureDetector(
+                  onTap: widget.onDelete,
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        border: Border.all(),
+                      ),
+                      width: boxConstraints.maxWidth * 0.2,
                       child: Text(
                         "ลบ",
-                        style: Theme.of(context).textTheme.displayLarge,
-                      )),
-                ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary,
-                    border: Border.all(),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      )
                   ),
-                  width: boxConstraints.maxWidth * 0.2,
-                  child: TextButton(
-                      onPressed: widget.onEdit,
+                ),
+                GestureDetector(
+                  onTap: widget.onEdit,
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary,
+                        border: Border.all(),
+                      ),
+                      width: boxConstraints.maxWidth * 0.2,
                       child: Text(
                         "แก้ไข",
-                        style: Theme.of(context).textTheme.displayLarge,
-                      )),
+                        style: Theme.of(context).textTheme.bodyLarge,
+                        textAlign: TextAlign.center,
+                      )
+                  ),
                 )
               ],
             );

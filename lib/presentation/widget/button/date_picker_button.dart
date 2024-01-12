@@ -11,15 +11,15 @@ class DateRangePickerButton extends StatelessWidget {
       onPressed: () async {
         final picked = await showDateRangePicker(
           context: context,
-          firstDate: DateTime(2000),
-          lastDate: DateTime(2100),
+          firstDate: DateTime(DateTime.now().year - 5),
+          lastDate: DateTime(DateTime.now().year + 5),
         );
 
         if (picked != null) {
           onDateRangePicked(picked.start, picked.end);
         }
       },
-      child: const Text("Pick Date Range"),
+      child: const Text("เลือกวันที่"),
     );
   }
 }

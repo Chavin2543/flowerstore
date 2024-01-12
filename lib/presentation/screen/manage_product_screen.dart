@@ -2,6 +2,7 @@ import 'package:flowerstore/data/datasource/category/model/request/add_category_
 import 'package:flowerstore/data/datasource/category/model/request/delete_category_request.dart';
 import 'package:flowerstore/data/datasource/category/model/request/get_category_request.dart';
 import 'package:flowerstore/data/datasource/category/model/request/patch_category_request.dart';
+import 'package:flowerstore/data/datasource/product/model/delete_product_request.dart';
 import 'package:flowerstore/data/datasource/product/model/get_product_request.dart';
 import 'package:flowerstore/helper/customer_store.dart';
 import 'package:flowerstore/presentation/bloc/category/category_bloc.dart';
@@ -46,7 +47,8 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("กำหนดราคาสำหรับโรงแรม"),
+          title: Text("กำหนดราคาสำหรับโรงแรม",
+              style: Theme.of(context).textTheme.bodyLarge),
           actions: [
             TextButton(
                 onPressed: () {
@@ -54,7 +56,7 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                 },
                 child: Text(
                   "เพิ่มสินค้า",
-                  style: Theme.of(context).textTheme.displayLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 )),
             TextButton(
                 onPressed: () {
@@ -62,7 +64,7 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                 },
                 child: Text(
                   "เพิ่มหมวดหมู่",
-                  style: Theme.of(context).textTheme.displayLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 )),
           ],
         ),
@@ -79,10 +81,11 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                           children: [
                             TextField(
                               decoration: InputDecoration(
-                                  prefixIcon: const Icon(Icons.search),
-                                  hintText: "ค้นหาหมวดหมู่",
-                                  hintStyle:
-                                      Theme.of(context).textTheme.displayLarge),
+                                prefixIcon: const Icon(Icons.search),
+                                hintText: "ค้นหาหมวดหมู่",
+                                hintStyle:
+                                    Theme.of(context).textTheme.bodyLarge,
+                              ),
                               controller: _categorySearchController,
                               onChanged: (text) {
                                 BlocProvider.of<CategoryBloc>(context).add(
@@ -123,7 +126,6 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                                                     const GetCategoryRequest()));
                                       } else {
                                         selectedCategory = category.id;
-
                                         BlocProvider.of<ProductBloc>(context)
                                             .add(
                                           QueryProductByCategoryEvent(
@@ -159,11 +161,11 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                               color: Theme.of(context).colorScheme.surface,
                               child: TextField(
                                 decoration: InputDecoration(
-                                    prefixIcon: const Icon(Icons.search),
-                                    hintText: "ค้นหาสินค้า",
-                                    hintStyle: Theme.of(context)
-                                        .textTheme
-                                        .displayLarge),
+                                  prefixIcon: const Icon(Icons.search),
+                                  hintText: "ค้นหาสินค้า",
+                                  hintStyle:
+                                      Theme.of(context).textTheme.bodyLarge,
+                                ),
                                 controller: _productSearchController,
                                 onChanged: (text) {
                                   BlocProvider.of<ProductBloc>(context)
@@ -177,8 +179,15 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
                                 return ManageProductItem(
                                   state.products[position],
                                   () {
-                                    _showProductEditDialog(
-                                        state.products[position]);
+                                    final product = state.products[position];
+                                    BlocProvider.of<ProductBloc>(context).add(
+                                      DeleteProductEvent(
+                                        request: DeleteProductRequest(
+                                            id: product.id,
+                                            customerId: product.customerId
+                                        ),
+                                      ),
+                                    );
                                   },
                                   () {
                                     _showProductEditDialog(
@@ -263,6 +272,27 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
         String unit = product.unit;
         double price = product.price;
 
+        void _saveProduct() {
+          if (_formKey.currentState!.validate()) {
+            final customerId = CustomerStore.getCustomerId();
+
+            if (customerId != null) {
+              BlocProvider.of<ProductBloc>(context).add(
+                PatchProductEvent(
+                  request: PatchProductRequest(
+                    name: name,
+                    unit: unit,
+                    price: price,
+                    id: product.id,
+                    customerId: customerId,
+                  ),
+                ),
+              );
+            }
+            Navigator.pop(context);
+          }
+        }
+
         return AlertDialog(
           title: const Text('แก้ไขสินค้า'),
           content: Form(
@@ -271,37 +301,99 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 TextFormField(
-                  initialValue: product.name,
-                  onChanged: (value) {
-                    name = value;
-                  },
+                    initialValue: product.name,
+                    onChanged: (value) {
+                      name = value;
+                    },
+                    onFieldSubmitted: (value) => _saveProduct(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณาใส่ข้อมูล';
+                      }
+                      return null;
+                    },
+                    style: Theme.of(context).textTheme.bodyLarge),
+                TextFormField(
+                    initialValue: product.unit,
+                    onChanged: (value) {
+                      unit = value;
+                    },
+                    onFieldSubmitted: (value) => _saveProduct(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณาใส่ข้อมูล';
+                      }
+                      return null;
+                    },
+                    style: Theme.of(context).textTheme.bodyLarge),
+                TextFormField(
+                    initialValue: product.price.toString(),
+                    onChanged: (value) {
+                      price = double.tryParse(value) ?? product.price;
+                    },
+                    onFieldSubmitted: (value) => _saveProduct(),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'กรุณาใส่ข่อมูล';
+                      }
+                      return null;
+                    },
+                    style: Theme.of(context).textTheme.bodyLarge),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child:
+                  Text('ยกเลิก', style: Theme.of(context).textTheme.bodyLarge),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child:
+                  Text('บันทึก', style: Theme.of(context).textTheme.bodyLarge),
+              onPressed: _saveProduct,
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCategoryAddDialog() {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        String name = "";
+
+        void saveCategory() {
+          if (_formKey.currentState!.validate()) {
+            final customerId = CustomerStore.getCustomerId();
+            if (customerId != null) {
+              BlocProvider.of<CategoryBloc>(context).add(
+                AddCategoryEvent(
+                    AddCategoryRequest(name: name, customerId: customerId)),
+              );
+            }
+            Navigator.pop(context);
+          }
+        }
+
+        return AlertDialog(
+          title: const Text('เพิ่มหมวดหมู่'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                TextFormField(
+                  decoration: const InputDecoration(hintText: "ชื่อหมวดหมู่"),
+                  onChanged: (value) => name = value,
+                  onFieldSubmitted: (value) => saveCategory(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'กรุณาใส่ข้อมูล';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  initialValue: product.unit,
-                  onChanged: (value) {
-                    unit = value;
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณาใส่ข้อมูล';
-                    }
-                    return null;
-                  },
-                ),
-                TextFormField(
-                  initialValue: product.price.toString(),
-                  onChanged: (value) {
-                    price = double.tryParse(value) ?? product.price;
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณาใส่ข่อมูล';
                     }
                     return null;
                   },
@@ -311,32 +403,14 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('ยกเลิก'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              child:
+                  Text('ยกเลิก', style: Theme.of(context).textTheme.bodyLarge),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
-              child: Text('บันทึก'),
-              onPressed: () {
-                final customerId = CustomerStore.getCustomerId();
-
-                if (customerId != null) {
-                  BlocProvider.of<ProductBloc>(context).add(
-                    PatchProductEvent(
-                      request: PatchProductRequest(
-                        name: name,
-                        unit: unit,
-                        price: price,
-                        id: product.id,
-                        customerId: customerId,
-                      ),
-                    ),
-                  );
-                }
-
-                Navigator.pop(context);
-              },
+              child:
+                  Text('บันทึก', style: Theme.of(context).textTheme.bodyLarge),
+              onPressed: saveCategory,
             ),
           ],
         );
@@ -345,14 +419,43 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
   }
 
   void _showProductAddDialog() {
+    String name = "";
+    String unit = "";
+    double price = 0.0;
+    int? selectedCategory = null;
+
+    var categoryBlocState = BlocProvider.of<CategoryBloc>(context).state;
+    if (categoryBlocState is CategoriesLoaded) {
+      if (categoryBlocState.categories.isEmpty) {
+        _showCategoryAddDialog();
+        return;
+      }
+    } else {
+      return;
+    }
+
+    void addProduct() {
+      if (_formKey.currentState!.validate()) {
+        if (selectedCategory != null) {
+          BlocProvider.of<ProductBloc>(context).add(
+            AddProductEvent(
+              request: AddProductRequest(
+                name: name,
+                price: price,
+                unit: unit,
+                categoryId: selectedCategory,
+                customerId: widget.customer.id,
+              ),
+            ),
+          );
+        }
+        Navigator.pop(context);
+      }
+    }
+
     showDialog(
       context: context,
       builder: (dialogContext) {
-        String name = "";
-        String unit = "";
-        double price = 0.0;
-        int? selectedCategory = null; // Initialize the selected category
-
         return AlertDialog(
           title: const Text('เพิ่มสินค้า'),
           content: Form(
@@ -433,85 +536,16 @@ class _ManageProductScreenState extends State<ManageProductScreen> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('ยกเลิก'),
+              child:
+                  Text('ยกเลิก', style: Theme.of(context).textTheme.bodyLarge),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: const Text('บันทึก'),
-              onPressed: () {
-                if (selectedCategory != null) {
-                  BlocProvider.of<ProductBloc>(context).add(
-                    AddProductEvent(
-                      request: AddProductRequest(
-                        name: name,
-                        price: price,
-                        unit: unit,
-                        categoryId: selectedCategory,
-                        customerId: widget.customer.id,
-                      ),
-                    ),
-                  );
-                }
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showCategoryAddDialog() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        String name = "";
-
-        return AlertDialog(
-          title: const Text('เพิ่มหมวดหมู่'),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                TextFormField(
-                  decoration: const InputDecoration(hintText: "ชื่อหมวดหมู่"),
-                  onChanged: (value) {
-                    name = value;
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'กรุณาใส่ข้อมูล';
-                    }
-                    return null;
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('ยกเลิก'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('บันทึก'),
-              onPressed: () {
-                final customerId = CustomerStore.getCustomerId();
-
-                if (customerId != null) {
-                  BlocProvider.of<CategoryBloc>(context).add(
-                    AddCategoryEvent(
-                        AddCategoryRequest(name: name, customerId: customerId)),
-                  );
-                }
-
-                Navigator.pop(context);
-              },
+              onPressed: addProduct,
+              child:
+                  Text('บันทึก', style: Theme.of(context).textTheme.bodyLarge),
             ),
           ],
         );

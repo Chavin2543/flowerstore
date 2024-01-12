@@ -18,93 +18,94 @@ class CustomProductDialog extends StatefulWidget {
 }
 
 class CustomProductDialogState extends State<CustomProductDialog> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController nameController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController quantityController = TextEditingController();
   TextEditingController unitController = TextEditingController();
 
   void handleSubmit() {
-    String name = nameController.text;
-    double price = double.parse(priceController.text);
-    int quantity = int.parse(quantityController.text);
-    String unit = unitController.text;
+    if (_formKey.currentState!.validate()) {
+      String name = nameController.text;
+      double price = double.tryParse(priceController.text) ?? 0;
+      int quantity = int.tryParse(quantityController.text) ?? 0;
+      String unit = unitController.text;
 
-    // Invoke the callback with the post request model
-    widget.onSubmit(
-      BillItem(
-        product: Product(
-          id: widget.product.id,
-          name: name,
-          categoryId: widget.product.categoryId,
-          customerId: widget.product.customerId,
-          price: price,
-          unit: unit,
+      widget.onSubmit(
+        BillItem(
+          product: Product(
+            id: widget.product.id,
+            name: name,
+            categoryId: widget.product.categoryId,
+            customerId: widget.product.customerId,
+            price: price,
+            unit: unit,
+          ),
+          quantity: quantity,
         ),
-        quantity: quantity,
-      ),
-    );
-    Navigator.of(context).pop();
+      );
+      Navigator.of(context).pop();
+    }
   }
 
   @override
   void initState() {
-    if (widget.product != null) {
-      nameController.text = widget.product?.name ?? "";
-      priceController.text = widget.product?.price.toString() ?? "";
-      unitController.text = widget.product?.unit ?? "";
-    }
-
     super.initState();
+    if (widget.product != null) {
+      nameController.text = widget.product.name;
+      priceController.text = widget.product.price.toString();
+      unitController.text = widget.product.unit;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('เพิ่มสินค้า'),
+      title: Text('เพิ่มสินค้า', style: Theme.of(context).textTheme.bodyLarge,),
       content: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'ชื่อ',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: const InputDecoration(labelText: 'ชื่อ'),
+                onFieldSubmitted: (text) => handleSubmit(),
+                style: Theme.of(context).textTheme.bodyLarge
               ),
-              onSubmitted: (text) => handleSubmit(),
-            ),
-            TextField(
-              controller: priceController,
-              decoration: const InputDecoration(
-                labelText: 'ราคา',
+              TextFormField(
+                controller: priceController,
+                decoration: const InputDecoration(labelText: 'ราคา'),
+                keyboardType: TextInputType.number,
+                onFieldSubmitted: (text) => handleSubmit(),
+                  style: Theme.of(context).textTheme.bodyLarge
               ),
-              onSubmitted: (text) => handleSubmit(),
-            ),
-            TextField(
-              controller: quantityController,
-              decoration: const InputDecoration(
-                labelText: 'จำนวน',
+              TextFormField(
+                  autofocus: true,
+                controller: quantityController,
+                decoration: const InputDecoration(labelText: 'จำนวน'),
+                keyboardType: TextInputType.number,
+                onFieldSubmitted: (text) => handleSubmit(),
+                  style: Theme.of(context).textTheme.bodyLarge
               ),
-              onSubmitted: (text) => handleSubmit(),
-            ),
-            TextField(
-              controller: unitController,
-              decoration: const InputDecoration(
-                labelText: 'หน่วย',
+              TextFormField(
+                controller: unitController,
+                decoration: const InputDecoration(labelText: 'หน่วย'),
+                onFieldSubmitted: (text) => handleSubmit(),
+                  style: Theme.of(context).textTheme.bodyLarge
               ),
-              onSubmitted: (text) => handleSubmit(),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          child: Text('ยกเลิก', style: Theme.of(context).textTheme.displayLarge,),
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text('ยกเลิก', style: Theme.of(context).textTheme.bodyLarge),
         ),
         TextButton(
-          onPressed: () { handleSubmit(); },
-          child: Text('เพิ่ม', style: Theme.of(context).textTheme.displayLarge,),
+          onPressed: handleSubmit,
+          child: Text('เพิ่ม', style: Theme.of(context).textTheme.bodyLarge),
         ),
       ],
     );

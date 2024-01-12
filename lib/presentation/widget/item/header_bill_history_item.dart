@@ -34,7 +34,7 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       "หมายเลขบิล",
-                      style: TextStyle(fontSize: 20),
+                      style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                   Container(
@@ -47,7 +47,7 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       "วันที่",
-                      style: TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                   Container(
@@ -60,7 +60,7 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       "ยอดรวม",
-                      style: TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                 ],

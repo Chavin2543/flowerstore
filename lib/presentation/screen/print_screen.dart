@@ -14,7 +14,8 @@ class PrintScreen extends StatefulWidget {
   Customer customer;
   List<BillItem> billItems;
 
-  PrintScreen({required this.billItems, required this.customer, Key? key}) : super(key: key);
+  PrintScreen({required this.billItems, required this.customer, Key? key})
+      : super(key: key);
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
@@ -24,17 +25,20 @@ class _PrintScreenState extends State<PrintScreen> {
   pw.Document? pdfDocument;
   pw.Font? customFont;
   String formattedDate = DateFormat('d MMMM y', 'th').format(DateTime.now());
+  int startIndex = 0;
+  int pageIndex = 0;
+  int totalPages = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadFont(); // No need for .then() here as setState is now inside _loadFont
+    _loadFont();
     pdfDocument = pw.Document();
   }
 
   Future<void> _loadFont() async {
     final ByteData data =
-    await rootBundle.load("assets/fonts/Kanit-Regular.ttf");
+        await rootBundle.load("assets/fonts/Kanit-Regular.ttf");
     final Uint8List fontBytes = data.buffer.asUint8List();
     final loadedFont = pw.Font.ttf(fontBytes.buffer.asByteData());
 
@@ -44,12 +48,14 @@ class _PrintScreenState extends State<PrintScreen> {
   }
 
   Future<Uint8List> _loadImageAsset() async {
-    final ByteData data = await rootBundle.load('assets/templates/bill-template.jpeg');
+    final ByteData data =
+        await rootBundle.load('assets/templates/bill-template.jpeg');
     final buffer = data.buffer.asUint8List();
     return buffer;
   }
 
   Future<pw.Document> _buildPdf(Uint8List imageBytes) async {
+    totalPages = (widget.billItems.length / 23).ceil();
     final pw.Document doc = pw.Document();
     doc.addPage(
       pw.Page(
@@ -65,11 +71,12 @@ class _PrintScreenState extends State<PrintScreen> {
                     maxHeight: 10, // Max height for the text
                   ),
                   child: pw.Text(
-                    widget.customer.name,
+                    "${pageIndex+1}/$totalPages ${widget.customer.name}",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 91, // position where you want to start your text or content
+                top: 91,
+                // position where you want to start your text or content
                 left: 422,
               ),
               pw.Positioned(
@@ -83,7 +90,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 168, // position where you want to start your text or content
+                top: 168,
+                // position where you want to start your text or content
                 left: 60,
               ),
               pw.Positioned(
@@ -97,7 +105,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 189.5, // position where you want to start your text or content
+                top: 189.5,
+                // position where you want to start your text or content
                 left: 355,
               ),
               pw.Positioned(
@@ -111,7 +120,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 207, // position where you want to start your text or content
+                top: 207,
+                // position where you want to start your text or content
                 left: 355,
               ),
               ...buildInvoiceItems()
@@ -127,69 +137,95 @@ class _PrintScreenState extends State<PrintScreen> {
   }
 
   List<pw.Widget> buildInvoiceItems() {
-    // Initial top position
     double topPosition = 250.0;
-
-    // Position increment for each row
-    double increment = 35.0;
-
-    // Build invoice items
+    double increment = 20.0;
     List<pw.Widget> items = [];
-    for (var item in widget.billItems) {
-      // Check if the top position exceeds 580
-      if (topPosition <= 580) {
+    List<BillItem> billItems = [];
+    if (widget.billItems.length > 23) {
+      if (widget.billItems.length - (pageIndex * 23) > 23) {
+        billItems = widget.billItems.sublist(pageIndex * 23, (pageIndex + 1) * 23);
+      } else {
+        billItems = widget.billItems.sublist(pageIndex * 23, widget.billItems.length);
+      }
+    } else {
+      billItems = widget.billItems;
+    }
+    for (var item in billItems) {
+      if (topPosition <= 700) {
         items.add(
           pw.Positioned(
-            top: topPosition,  // calculated top position
-            left: 30,  // constant left position
+            top: topPosition, // calculated top position
+            left: 30, // constant left position
             child: pw.Row(
               children: [
                 pw.Container(
                   child: pw.ConstrainedBox(
-                    constraints: pw.BoxConstraints(minWidth: 42, maxWidth: 42, maxHeight: 30, minHeight: 30),
-                    child: pw.Text('${item.quantity}', style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    constraints: const pw.BoxConstraints(
+                        minWidth: 42,
+                        maxWidth: 42,
+                        maxHeight: 30,
+                        minHeight: 30),
+                    child: pw.Text('${item.quantity}',
+                        style: pw.TextStyle(fontSize: 8, font: customFont)),
                   ),
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
                   child: pw.ConstrainedBox(
-                    constraints: pw.BoxConstraints(minWidth: 30, maxWidth: 30, maxHeight: 30, minHeight: 30),
-                    child: pw.Text('${item.product.unit}', style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    constraints: const pw.BoxConstraints(
+                        minWidth: 30,
+                        maxWidth: 30,
+                        maxHeight: 30,
+                        minHeight: 30),
+                    child: pw.Text(item.product.unit,
+                        style: pw.TextStyle(fontSize: 8, font: customFont)),
                   ),
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
                   child: pw.ConstrainedBox(
-                    constraints: pw.BoxConstraints(minWidth: 223, maxWidth: 223, maxHeight: 30, minHeight: 30),
-                    child: pw.Text('${item.product.name}', style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    constraints: const pw.BoxConstraints(
+                        minWidth: 223,
+                        maxWidth: 223,
+                        maxHeight: 30,
+                        minHeight: 30),
+                    child: pw.Text(item.product.name,
+                        style: pw.TextStyle(fontSize: 8, font: customFont)),
                   ),
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
                   child: pw.ConstrainedBox(
-                    constraints: pw.BoxConstraints(minWidth: 48, maxWidth: 48, maxHeight: 30, minHeight: 30),
-                    child: pw.Text('${item.product.price}', style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    constraints: const pw.BoxConstraints(
+                        minWidth: 48,
+                        maxWidth: 48,
+                        maxHeight: 30,
+                        minHeight: 30),
+                    child: pw.Text('${item.product.price}',
+                        style: pw.TextStyle(fontSize: 8, font: customFont)),
                   ),
                 ),
                 pw.SizedBox(width: 15),
                 pw.Container(
                   child: pw.ConstrainedBox(
-                    constraints: pw.BoxConstraints(minWidth: 48, maxWidth: 48, maxHeight: 30, minHeight: 30),
-                    child: pw.Text('${item.product.price * item.quantity}', style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    constraints: const pw.BoxConstraints(
+                        minWidth: 48,
+                        maxWidth: 48,
+                        maxHeight: 30,
+                        minHeight: 30),
+                    child: pw.Text('${item.product.price * item.quantity}',
+                        style: pw.TextStyle(fontSize: 8, font: customFont)),
                   ),
                 ),
               ],
             ),
           ),
         );
-        topPosition += increment;  // increment the top position for the next row
+        topPosition += increment; // increment the top position for the next row
       }
     }
     return items;
   }
-
-
-
 
 // Function to print the PDF
   Future<void> _printPdf() async {
@@ -236,13 +272,15 @@ class _PrintScreenState extends State<PrintScreen> {
                   child: FutureBuilder<pw.Document>(
                     future: _buildPdf(snapshot.data!),
                     builder: (context, pdfSnapshot) {
-                      if (pdfSnapshot.connectionState == ConnectionState.waiting) {
+                      if (pdfSnapshot.connectionState ==
+                          ConnectionState.waiting) {
                         return const LoadingScreen();
                       } else if (pdfSnapshot.hasError) {
                         return Text('PDF Error: ${pdfSnapshot.error}');
                       } else if (pdfSnapshot.hasData) {
                         return PdfPreview(
-                          build: (format) async => await pdfSnapshot.data!.save(),
+                          build: (format) async =>
+                              await pdfSnapshot.data!.save(),
                         );
                       } else {
                         return Text('Unexpected PDF state');
@@ -256,6 +294,31 @@ class _PrintScreenState extends State<PrintScreen> {
             return Text('Unexpected state');
           }
         },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: pageIndex > 0
+                  ? () {
+                setState(() {
+                  pageIndex--;
+                });
+              }
+                  : null,
+            ),
+            IconButton(
+              icon: Icon(Icons.arrow_forward),
+              onPressed: () {
+                setState(() {
+                  pageIndex++;
+                });
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

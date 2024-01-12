@@ -84,7 +84,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
       appBar: AppBar(
         title: Text(
             "สร้างบิลที่ ${widget.displayInvoiceId} ของ ${CustomerStore.getCustomerName()}",
-            style: Theme.of(context).textTheme.displayLarge),
+            style: Theme.of(context).textTheme.bodyLarge),
         actions: [_buildRefreshButton()],
       ),
       body: BlocListener<InvoiceBloc, InvoiceState>(listener: (context, state) {
@@ -145,6 +145,12 @@ class CreateBillScreenState extends State<CreateBillScreen> {
         onDelete: () => deleteBillByProduct(item),
         onDecrease: () => deductBillByProduct(item),
         onIncrease: () => addBillByProduct(item),
+        onChangePrice: (double newPrice) => {
+          changePriceByProduct(item, newPrice)
+        },
+        onChangeQuantity: (int newQuantity) => {
+          changeQuantityByProduct(item, newQuantity)
+        },
       );
     }).toList();
   }
@@ -191,7 +197,6 @@ class CreateBillScreenState extends State<CreateBillScreen> {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
     final invoiceId = currentInvoiceId;
-
     if (total == 0) {
       showDialog(
         context: context,
@@ -212,7 +217,6 @@ class CreateBillScreenState extends State<CreateBillScreen> {
       );
       return;
     }
-
     if (customerId != null) {
       if (invoiceId != null) {
         BlocProvider.of<InvoiceBloc>(context).add(
@@ -248,6 +252,28 @@ class CreateBillScreenState extends State<CreateBillScreen> {
       currentBillItems = currentBillItems.map((billItem) {
         if (billItem.product.id == targetProduct.product.id) {
           final newQuantity = billItem.quantity + (quantity ?? 1);
+          return billItem.copyWith(quantity: newQuantity);
+        }
+        return billItem;
+      }).toList();
+    });
+  }
+
+  void changePriceByProduct(BillItem targetProduct, double newPrice) {
+    setState(() {
+      currentBillItems = currentBillItems.map((billItem) {
+        if (billItem.product.id == targetProduct.product.id) {
+          return billItem.copyWith(product: targetProduct.product.copyWith(price: newPrice));
+        }
+        return billItem;
+      }).toList();
+    });
+  }
+
+  void changeQuantityByProduct(BillItem targetProduct, int newQuantity) {
+    setState(() {
+      currentBillItems = currentBillItems.map((billItem) {
+        if (billItem.product.id == targetProduct.product.id) {
           return billItem.copyWith(quantity: newQuantity);
         }
         return billItem;

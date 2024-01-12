@@ -29,6 +29,18 @@ class AddProductEvent implements ProductEvent {
   bool? get stringify => false;
 }
 
+class DeleteProductEvent implements ProductEvent {
+  final DeleteProductRequest request;
+
+  DeleteProductEvent({required this.request});
+
+  @override
+  List<Object?> get props => [request];
+
+  @override
+  bool? get stringify => false;
+}
+
 class PatchProductEvent implements ProductEvent {
   final PatchProductRequest request;
 

@@ -165,7 +165,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             width: proxy.maxWidth * 0.4,
             child: Text(
               "ยินดีต้อนรับเข้าสูร้านดอกไม้\nโปรดเลือกลูกค้าที่คุณต้องการ",
-              style: Theme.of(context).textTheme.displayLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
           SizedBox(
@@ -198,7 +198,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         onPressed: onPressed,
         child: Text(
           text,
-          style: Theme.of(context).textTheme.displaySmall,
+          style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),
     );
@@ -266,13 +266,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('สำเร็จ'),
+          title: const Text('สำเร็จ'),
           // You can change this to match your message title
-          content: Text('ลูกค้าถูกเพิ่ม'),
+          content: const Text('ลูกค้าถูกเพิ่ม'),
           // Message you want to show
           actions: <Widget>[
             TextButton(
-              child: Text('ตกลง'),
+              child: const Text('ตกลง'),
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss the dialog
               },

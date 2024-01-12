@@ -1,6 +1,7 @@
 // Package imports:
 import 'package:equatable/equatable.dart';
 import 'package:flowerstore/data/api_error.dart';
+import 'package:flowerstore/data/datasource/product/model/delete_product_request.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 
@@ -23,6 +24,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc(this._dataSource) : super(ProductInitial()) {
     on<GetProductEvent>((event, emit) async => _onGetProductsEvent(event, emit));
     on<AddProductEvent>((event, emit) async => _onPostProductsEvent(event, emit));
+    on<DeleteProductEvent>((event, emit) async => _onDeleteProductsEvent(event, emit));
     on<PatchProductEvent>((event, emit) async => _onPatchProduct(event, emit));
     on<QueryProductByCategoryEvent>((event, emit) async => _onQueryProductByCategoryEvent(event, emit));
     on<QueryProductByTextEvent>((event, emit) async => _onQueryProductByTextEvent(event, emit));
@@ -61,6 +63,32 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
     try {
       final response = await _dataSource.addProduct(event.request);
+
+      emit(
+        ProductsLoaded(
+          response
+              .where((element) => element.customerId == CustomerStore.getCustomerId())
+              .toList(),
+        ),
+      );
+    } on APIError catch (error) {
+      emit(ProductError(message: error.message));
+
+      if (cacheState is ProductsLoaded) {
+        emit(cacheState);
+      } else {
+        emit(ProductsLoaded(const []));
+      }
+    }
+  }
+
+  _onDeleteProductsEvent(DeleteProductEvent event, Emitter<ProductState> emit) async {
+    final cacheState = state;
+
+    emit(ProductLoading());
+
+    try {
+      final response = await _dataSource.deleteProduct(event.request);
 
       emit(
         ProductsLoaded(

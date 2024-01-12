@@ -25,4 +25,22 @@ class Product {
       unit: json['unit'],
     );
   }
+
+  Product copyWith({
+    int? id,
+    String? name,
+    int? categoryId,
+    double? price,
+    String? unit,
+    int? customerId
+  }) {
+    return Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      categoryId: categoryId ?? this.categoryId,
+      price: price ?? this.price,
+      unit: unit ?? this.unit,
+      customerId: customerId ?? this.customerId
+    );
+  }
 }

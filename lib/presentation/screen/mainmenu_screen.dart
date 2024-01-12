@@ -48,8 +48,8 @@ class MainMenuScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(customer.name,
-              style: Theme.of(context).textTheme.displayLarge),
+          title:
+              Text(customer.name, style: Theme.of(context).textTheme.bodyLarge),
         ),
         body: SingleChildScrollView(
           child: SizedBox(
@@ -64,9 +64,9 @@ class MainMenuScreen extends StatelessWidget {
                     context,
                     MainMenuType.createBill,
                     () async => _navigateToCreateBillScreen(
-                      context,
-                      await BlocProvider.of<InvoiceBloc>(context).generateInvoiceId()
-                    ),
+                        context,
+                        await BlocProvider.of<InvoiceBloc>(context)
+                            .generateInvoiceId()),
                     largeButtonWidth),
                 _buildMenuItem(
                     context,
@@ -192,7 +192,19 @@ class MainMenuScreen extends StatelessWidget {
 
   void _navigateToAnalyticScreen(BuildContext context) {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (navigatorContext) => AnalyticScreen()),
+      MaterialPageRoute(
+        builder: (navigatorContext) => MultiBlocProvider(
+          providers: [
+            BlocProvider.value(value: BlocProvider.of<CustomerBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<ProductBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
+            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
+          ],
+          child: AnalyticScreen(),
+        ),
+      ),
     );
   }
 

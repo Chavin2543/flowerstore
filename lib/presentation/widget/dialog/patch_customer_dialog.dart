@@ -36,28 +36,28 @@ class PatchCustomerDialogState extends State<PatchCustomerDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('ข้อมูลลูกค้า'),
+      title: Text('ข้อมูลลูกค้า', style: Theme.of(context).textTheme.bodyLarge),
       content: SingleChildScrollView(
         child: Column(
           children: [
             TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'ชื่อ',
-              ),
-            ),
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'ชื่อ',
+                ),
+                style: Theme.of(context).textTheme.bodyLarge),
             TextField(
-              controller: addressController,
-              decoration: const InputDecoration(
-                labelText: 'ที่อยู่',
-              ),
-            ),
+                controller: addressController,
+                decoration: const InputDecoration(
+                  labelText: 'ที่อยู่',
+                ),
+                style: Theme.of(context).textTheme.bodyLarge),
             TextField(
-              controller: phoneController,
-              decoration: const InputDecoration(
-                labelText: 'เบอร์โทร',
-              ),
-            ),
+                controller: phoneController,
+                decoration: const InputDecoration(
+                  labelText: 'เบอร์โทร',
+                ),
+                style: Theme.of(context).textTheme.bodyLarge),
           ],
         ),
       ),
@@ -68,7 +68,7 @@ class PatchCustomerDialogState extends State<PatchCustomerDialog> {
           },
           child: Text(
             'ยกเลิก',
-            style: Theme.of(context).textTheme.displayLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
         TextButton(
@@ -92,7 +92,7 @@ class PatchCustomerDialogState extends State<PatchCustomerDialog> {
           },
           child: Text(
             'แก้ไข',
-            style: Theme.of(context).textTheme.displayLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
       ],

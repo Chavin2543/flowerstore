@@ -19,8 +19,8 @@ class SummaryScreen extends StatefulWidget {
 }
 
 class SummaryScreenState extends State<SummaryScreen> {
-  DateTime? startDate;
-  DateTime? endDate;
+  DateTime startDate = DateTime(DateTime.now().year, 1, 1);
+  DateTime endDate = DateTime.now();
   List<Invoice> filteredInvoices = [];
 
   @override
@@ -33,48 +33,13 @@ class SummaryScreenState extends State<SummaryScreen> {
   }
 
   void _calculateTotals(List<Invoice> invoices) {
-    if (startDate != null && endDate != null) {
-      filteredInvoices = [];
-
-      filteredInvoices = invoices.where(
-        (invoice) {
-          return invoice.date.isAfter(
-                startDate!.subtract(
-                  const Duration(days: 1),
-                ),
-              ) &&
-              invoice.date.isBefore(
-                endDate!.add(
-                  const Duration(days: 1),
-                ),
-              );
-        },
-      ).toList();
-    } else {
-      filteredInvoices = invoices;
-    }
-    setState(() {});
-  }
-
-  Map<int, double> calculateCompanyTotals(List<Invoice> invoices) {
-    final Map<int, double> companyTotals = {};
-
-    for (final invoice in invoices) {
-      final total = double.parse(invoice.total);
-
-      if (companyTotals.containsKey(invoice.customerId)) {
-        double? ivdTotal = companyTotals[invoice.customerId];
-        if (ivdTotal == null) {
-          companyTotals[invoice.customerId] = total;
-        } else {
-          companyTotals[invoice.customerId] = total + ivdTotal;
-        }
-      } else {
-        companyTotals[invoice.customerId] = total;
-      }
-    }
-
-    return companyTotals;
+    filteredInvoices = invoices.where((invoice) {
+      return invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)));
+    }).toList();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {});
+    });
   }
 
   Map<String, double> calculateCompanyTotalsStringKey(List<Invoice> invoices) {
@@ -82,21 +47,42 @@ class SummaryScreenState extends State<SummaryScreen> {
 
     for (final invoice in invoices) {
       final total = double.parse(invoice.total);
-      final name = widget.customer.firstWhere((element) => element.id == invoice.customerId).name;
+      final customer = widget.customer.firstWhere(
+              (element) => element.id == invoice.customerId,
+          orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '') // Replace with a suitable default customer
+      );
+
+      final name = customer.name;
 
       if (companyTotals.containsKey(name)) {
-        double? ivdTotal = companyTotals[name];
-        if (ivdTotal == null) {
-          companyTotals[name] = total;
-        } else {
-          companyTotals[name] = total + ivdTotal;
-        }
+        companyTotals[name] = companyTotals[name]! + total;
       } else {
         companyTotals[name] = total;
       }
     }
 
     return companyTotals;
+  }
+
+  double _calculateTotalWithinRange(List<Invoice> invoices) {
+    double total = 0.0;
+    for (var invoice in invoices) {
+      total += double.tryParse(invoice.total) ?? 0.0;
+    }
+    return total;
+  }
+
+  Map<DateTime, double> _aggregateTotalsByMonth(List<Invoice> invoices) {
+    Map<DateTime, double> monthlyTotals = {};
+    for (var invoice in invoices) {
+      if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
+        DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
+        double total = double.tryParse(invoice.total) ?? 0;
+        monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
+      }
+    }
+    return monthlyTotals;
   }
 
   @override
@@ -106,6 +92,8 @@ class SummaryScreenState extends State<SummaryScreen> {
       body: BlocConsumer<AnalyticBloc, AnalyticState>(
         builder: (context, state) {
           if (state is AnalyticLoaded) {
+            _calculateTotals(state.invoices);
+            double totalWithinRange = _calculateTotalWithinRange(filteredInvoices);
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -116,24 +104,29 @@ class SummaryScreenState extends State<SummaryScreen> {
                     child: DateRangePickerButton(
                       onDateRangePicked: (DateTime? start, DateTime? end) {
                         setState(() {
-                          startDate = start;
-                          endDate = end;
+                          startDate = start ?? DateTime(DateTime.now().year, 1, 1);
+                          endDate = end ?? DateTime.now();
                         });
                         _calculateTotals(state.invoices);
                       },
                     ),
                   ),
+                  Text(
+                    'ยอดรวมในระยะเวลาที่เลือก: $totalWithinRange',
+                    style: Theme.of(context).textTheme.displayLarge,
+                  ),
                   Expanded(
                     child: Column(
                       children: [
-                        Expanded(
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.3,
                           child: InvoiceSummary(
                             totals: calculateCompanyTotalsStringKey(filteredInvoices),
                           ),
                         ),
                         Expanded(
                           child: BarChartSummary(
-                            totals: calculateCompanyTotalsStringKey(filteredInvoices),
+                            totals: _aggregateTotalsByMonth(filteredInvoices),
                           ),
                         ),
                       ],
@@ -146,11 +139,7 @@ class SummaryScreenState extends State<SummaryScreen> {
             return const LoadingScreen();
           }
         },
-        listener: (context, state) {
-          if (state is AnalyticLoaded) {
-            _calculateTotals(state.invoices);
-          }
-        },
+        listener: (context, state) {},
       ),
     );
   }

@@ -19,14 +19,14 @@ class DeleteConfirmationDialog extends StatelessWidget {
           },
           child: Text(
             'ยกเลิก',
-            style: Theme.of(context).textTheme.displayLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
         TextButton(
           onPressed: () => onConfirm(),
           child: Text(
             'ยืนยัน',
-            style: Theme.of(context).textTheme.displayLarge,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
         ),
       ],

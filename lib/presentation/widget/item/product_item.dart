@@ -51,7 +51,7 @@ class ProductItemState extends State<ProductItem> {
                     width: _isCategory ? boxConstraints.maxWidth : boxConstraints.maxWidth / 3,
                     child: Text(
                       widget.name,
-                      style: Theme.of(context).textTheme.displayLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -61,7 +61,7 @@ class ProductItemState extends State<ProductItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       " (${widget.unit})",
-                      style: Theme.of(context).textTheme.displayLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -71,7 +71,7 @@ class ProductItemState extends State<ProductItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       "${widget.price.toString()} ",
-                      style: Theme.of(context).textTheme.displayLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                       textAlign: TextAlign.center,
                     ),
                   ),

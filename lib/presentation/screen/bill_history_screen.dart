@@ -111,7 +111,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
         return AlertDialog(
           title: Text(
             'จัดการบิลนี้',
-            style: Theme.of(context).textTheme.displayMedium,
+            style: Theme.of(context).textTheme.bodyLarge,
           ),
           content: TextField(
             controller: _invoiceIdController,
@@ -122,7 +122,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
             TextButton(
               child: Text(
                 'ดูบิล',
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -132,7 +132,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
             TextButton(
               child: Text(
                 'แก้ไขหมายเลข',
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               onPressed: () {
                 BlocProvider.of<InvoiceBloc>(context).add(
@@ -150,7 +150,7 @@ class _BillHistoryScreenState extends State<BillHistoryScreen> {
             TextButton(
               child: Text(
                 'ลบบิล',
-                style: Theme.of(context).textTheme.displayMedium,
+                style: Theme.of(context).textTheme.bodyLarge,
               ),
               onPressed: () {
                 BlocProvider.of<InvoiceBloc>(context).add(

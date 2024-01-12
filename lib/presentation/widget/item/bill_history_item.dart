@@ -40,7 +40,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       widget.invoice.invoiceId.toString(),
-                      style: const TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                   Container(
@@ -50,7 +50,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       formattedDate,
-                      style: const TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                   Container(
@@ -60,7 +60,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     width: boxConstraints.maxWidth / 3,
                     child: Text(
                       widget.invoice.total.toString(),
-                      style: const TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
                 ],

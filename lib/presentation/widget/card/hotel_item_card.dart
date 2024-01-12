@@ -43,7 +43,7 @@ class HotelItemCardState extends State<HotelItemCard> {
                   children: [
                     Text(
                       widget.name,
-                      style: Theme.of(context).textTheme.titleLarge,
+                      style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ],
                 ),

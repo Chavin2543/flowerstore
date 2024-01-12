@@ -29,7 +29,7 @@ class BillSummary extends StatelessWidget {
             ),
             child: Text(
               "รวมเป็นเงิน : $total บาท",
-              style: Theme.of(context).textTheme.displayLarge,
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ),
           const SizedBox(width: 16,),
@@ -49,7 +49,7 @@ class BillSummary extends StatelessWidget {
                 ),
                 child: Text(
                   "ออกบิล",
-                  style: Theme.of(context).textTheme.displayLarge?.copyWith(),
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
                 ),
               ),
             ),

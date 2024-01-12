@@ -13,7 +13,7 @@ class ManageProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(border: Border.all(), color: Colors.white),
+      decoration: const BoxDecoration(color: Colors.white),
       child: LayoutBuilder(
         builder: (context, boxConstraints) {
           return Row(
@@ -25,7 +25,7 @@ class ManageProductItem extends StatelessWidget {
                 width: boxConstraints.maxWidth * 0.4,
                 child: Text(
                   product.name,
-                  style: Theme.of(context).textTheme.displayLarge,
+                  style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -36,7 +36,7 @@ class ManageProductItem extends StatelessWidget {
                   width: boxConstraints.maxWidth * 0.2,
                   child: Text(
                     product.unit,
-                    style: Theme.of(context).textTheme.displayLarge,
+                    style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   )),
               Container(
@@ -46,32 +46,36 @@ class ManageProductItem extends StatelessWidget {
                   width: boxConstraints.maxWidth * 0.2,
                   child: Text(
                     product.price.toString(),
-                    style: Theme.of(context).textTheme.displayLarge,
+                    style: Theme.of(context).textTheme.bodyLarge,
                     textAlign: TextAlign.center,
                   )),
-              Container(
-                decoration: const BoxDecoration(
-                    color: Colors.red
-                ),
-                width: boxConstraints.maxWidth * 0.1,
-                child: TextButton(
-                    onPressed: onDelete,
+              GestureDetector(
+                onTap: onDelete,
+                child: Container(
+                    decoration: const BoxDecoration(
+                        color: Colors.red
+                    ),
+                    width: boxConstraints.maxWidth * 0.1,
                     child: Text(
                       "ลบ",
-                      style: Theme.of(context).textTheme.displayLarge,
-                    )),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondary
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    )
                 ),
-                width: boxConstraints.maxWidth * 0.1,
-                child: TextButton(
-                    onPressed: onEdit,
+              ),
+              GestureDetector(
+                onTap: onEdit,
+                child: Container(
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                    width: boxConstraints.maxWidth * 0.1,
                     child: Text(
                       "แก้ไข",
-                      style: Theme.of(context).textTheme.displayLarge,
-                    )),
+                      style: Theme.of(context).textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    )
+                ),
               )
             ],
           );

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class InvoiceSummary extends StatelessWidget {
   final Map<String, double> totals;
 
-  InvoiceSummary({required this.totals});
+  const InvoiceSummary({super.key, required this.totals});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +42,7 @@ class InvoiceSummary extends StatelessWidget {
                       child: ListTile(
                         tileColor: Colors.transparent,
                         title: Text(name),
-                        subtitle: Text('Total: \$$total'),
+                        subtitle: Text('รวมทั้งหมด $total บาท'),
                       ),
                     );
                   },

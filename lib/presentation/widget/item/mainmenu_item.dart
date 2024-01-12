@@ -46,7 +46,7 @@ class MainMenuItemState extends State<MainMenuItem> {
                 ),
                 Text(
                   widget.type.title,
-                  style: Theme.of(context).textTheme.headline5,
+                  style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ],
             ),
