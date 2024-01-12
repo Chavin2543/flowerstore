@@ -4,6 +4,7 @@ import 'package:flowerstore/presentation/bloc/analytic/analytic_bloc.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import '../../domain/entity/customer.dart';
 import '../widget/button/date_picker_button.dart';
 import '../widget/section/bar_chart_summary.dart';
@@ -112,7 +113,7 @@ class SummaryScreenState extends State<SummaryScreen> {
                     ),
                   ),
                   Text(
-                    'ยอดรวมในระยะเวลาที่เลือก: $totalWithinRange',
+                    'ยอดรวมในระหว่าง ${formatDateTimeToThaiDate(startDate)} ถึง ${formatDateTimeToThaiDate(endDate)} : $totalWithinRange บาท',
                     style: Theme.of(context).textTheme.displayLarge,
                   ),
                   Expanded(
@@ -142,5 +143,12 @@ class SummaryScreenState extends State<SummaryScreen> {
         listener: (context, state) {},
       ),
     );
+  }
+
+  String formatDateTimeToThaiDate(DateTime dateTime) {
+    // Format the input DateTime object to Thai date format
+    String formattedDate = DateFormat('d MMM yy', 'th').format(dateTime);
+
+    return formattedDate;
   }
 }

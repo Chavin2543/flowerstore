@@ -71,7 +71,7 @@ class _PrintScreenState extends State<PrintScreen> {
                     maxHeight: 10, // Max height for the text
                   ),
                   child: pw.Text(
-                    "${pageIndex+1}/$totalPages ${widget.customer.name}",
+                    "${pageIndex + 1}/$totalPages ${widget.customer.name}",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
@@ -143,9 +143,11 @@ class _PrintScreenState extends State<PrintScreen> {
     List<BillItem> billItems = [];
     if (widget.billItems.length > 23) {
       if (widget.billItems.length - (pageIndex * 23) > 23) {
-        billItems = widget.billItems.sublist(pageIndex * 23, (pageIndex + 1) * 23);
+        billItems =
+            widget.billItems.sublist(pageIndex * 23, (pageIndex + 1) * 23);
       } else {
-        billItems = widget.billItems.sublist(pageIndex * 23, widget.billItems.length);
+        billItems =
+            widget.billItems.sublist(pageIndex * 23, widget.billItems.length);
       }
     } else {
       billItems = widget.billItems;
@@ -303,19 +305,21 @@ class _PrintScreenState extends State<PrintScreen> {
               icon: Icon(Icons.arrow_back),
               onPressed: pageIndex > 0
                   ? () {
-                setState(() {
-                  pageIndex--;
-                });
-              }
+                      setState(() {
+                        pageIndex--;
+                      });
+                    }
                   : null,
             ),
             IconButton(
               icon: Icon(Icons.arrow_forward),
-              onPressed: () {
-                setState(() {
-                  pageIndex++;
-                });
-              },
+              onPressed: pageIndex + 1 < totalPages
+                  ? () {
+                      setState(() {
+                        pageIndex++;
+                      });
+                    }
+                  : null,
             ),
           ],
         ),
