@@ -1,7 +1,10 @@
+import 'package:flowerstore/data/datasource/invoice/model/request/get_invoice_request.dart';
 import 'package:flowerstore/domain/entity/bill_item.dart';
+import 'package:flowerstore/presentation/bloc/invoice/invoice_bloc.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -41,6 +44,7 @@ class _PrintScreenState extends State<PrintScreen> {
     super.initState();
     _loadFont();
     pdfDocument = pw.Document();
+    BlocProvider.of<InvoiceBloc>(context).add(GetInvoicesEvent(request: GetInvoiceRequest(), shouldFilter: false));
   }
 
   @override
@@ -331,6 +335,5 @@ class _PrintScreenState extends State<PrintScreen> {
     final pdfFile = await doc.save();
 
     await file.writeAsBytes(pdfFile);
-    print("PDF saved at $path");
   }
 }

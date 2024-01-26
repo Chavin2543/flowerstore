@@ -46,7 +46,7 @@ class DiscountDialogState extends State<DiscountDialog> {
   @override
   void initState() {
     super.initState();
-    discountController.text = widget.oldDiscount.toString();
+    discountController.text = (widget.oldDiscount/widget.total * 100).toString();
   }
 
   @override

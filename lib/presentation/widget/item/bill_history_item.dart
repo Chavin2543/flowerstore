@@ -1,4 +1,6 @@
+import 'package:flowerstore/presentation/bloc/department/department_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
 import '../../../domain/entity/invoice.dart';
@@ -37,7 +39,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 5,
                     child: Text(
                       widget.invoice.invoiceId.toString(),
                         style: Theme.of(context).textTheme.bodyLarge
@@ -47,7 +49,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 5,
                     child: Text(
                       formattedDate,
                         style: Theme.of(context).textTheme.bodyLarge
@@ -57,12 +59,47 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 5,
                     child: Text(
                       widget.invoice.discountedTotal.toString(),
                         style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(border: Border.all()),
+                    width: boxConstraints.maxWidth / 5,
+                    child: Text(
+                        widget.invoice.biller,
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  BlocBuilder<DepartmentBloc, DepartmentState>(builder: (context, state) {
+                    if (state is DepartmentLoaded) {
+                      return  Container(
+                        height: 60.0,  // Height is set
+                        alignment: Alignment.center,  // <-- Added alignment
+                        decoration: BoxDecoration(border: Border.all()),
+                        width: boxConstraints.maxWidth / 5,
+                        child: Text(
+                            state.departments.firstWhere((element) => element.id == widget.invoice.departmentId).name.toString(),
+                            style: Theme.of(context).textTheme.bodyLarge
+                        ),
+                      );
+                    } else {
+                      return Container(
+                        height: 60.0,  // Height is set
+                        alignment: Alignment.center,  // <-- Added alignment
+                        decoration: BoxDecoration(border: Border.all()),
+                        width: boxConstraints.maxWidth / 5,
+                        child: Text(
+                            "ไม่ระบุ",
+                            style: Theme.of(context).textTheme.bodyLarge
+                        ),
+                      );
+                    }
+                  }),
                 ],
               ),
             ),

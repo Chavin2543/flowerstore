@@ -99,7 +99,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            "สร้างบิลที่ ${widget.displayInvoiceId} ของ ${CustomerStore.getCustomerName()}",
+            "สร้างบิลที่ ${widget.displayInvoiceId} ของ ${CustomerStore.getCustomerName()} ออกโดย บริษัท${widget.invoice?.biller ?? "ยังไม่ระบุ"}",
             style: Theme.of(context).textTheme.bodyLarge),
         actions: [
           _buildRefreshButton(),
@@ -123,10 +123,6 @@ extension CreateBillNavigation on CreateBillScreenState {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
     final invoiceId = currentInvoiceId;
-    if (total == 0) {
-      showProductsNotAddedDialog();
-      return;
-    }
     if (customerId != null) {
       BlocProvider.of<InvoiceBloc>(context).add(
         PatchInvoiceEvent(
@@ -146,11 +142,16 @@ extension CreateBillNavigation on CreateBillScreenState {
 
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (navigatorContext2) => PrintScreen(
-            billItems: currentBillItems,
-            customer: widget.customer,
-            company: selectedCompany,
-            department: selectedDepartment,
+          builder: (navigatorContext2) => MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
+            ],
+            child: PrintScreen(
+              billItems: currentBillItems,
+              customer: widget.customer,
+              company: selectedCompany,
+              department: selectedDepartment,
+            ),
           ),
         ),
       );
@@ -398,6 +399,11 @@ extension CreateBillAction on CreateBillScreenState {
   }
 
   void _handleContinue() async {
+    if (currentBillItems.total == 0) {
+      showProductsNotAddedDialog();
+      return;
+    }
+
     final discount = await showDiscountDialog();
     if (discount == null) return;
     final selectedDepartment = await showDepartmentSelectionDialog();

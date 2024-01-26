@@ -107,7 +107,7 @@ extension SummaryScreenCalculations on SummaryScreenState {
   Map<String, double> calculateCompanyTotalsStringKey(List<Invoice> invoices) {
     final Map<String, double> companyTotals = {};
     for (final invoice in invoices) {
-      final total = invoice.total;
+      final total = invoice.discountedTotal;
       final customer = widget.customer.firstWhere(
               (element) => element.id == invoice.customerId,
           orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '')
@@ -125,7 +125,7 @@ extension SummaryScreenCalculations on SummaryScreenState {
   double _calculateTotalWithinRange(List<Invoice> invoices) {
     double total = 0.0;
     for (var invoice in invoices) {
-      total += invoice.total;
+      total += invoice.discountedTotal;
     }
     return total;
   }
@@ -136,7 +136,7 @@ extension SummaryScreenCalculations on SummaryScreenState {
       if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
           invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
         DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
-        double total = invoice.total;
+        double total = invoice.discountedTotal;
         monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
       }
     }
