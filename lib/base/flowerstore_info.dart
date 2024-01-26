@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class FlowerStoreInfo {
-  static String currentVersion = "1.0.0";
+  static String currentVersion = "1.0.3";
 }
 
 String get platformExt {
