@@ -48,26 +48,30 @@ class FlowerStore extends StatelessWidget {
         ],
         child: Stack(
           children: [
+            const DashboardScreen(),
             UpdatWidget(
                 currentVersion: version,
                 getLatestVersion: () async {
                   final dio = Dio();
                   final response = await dio.get(
                       "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
-                  return jsonDecode(response.data)["tag_name"];
+                  try {
+                    final tagName = response.data["tag_name"];
+                    return tagName;
+                  } on Error catch (error) {
+                    print(error);
+                  }
                 },
                 getBinaryUrl: (version) async {
-                  // Update or remove this depending on your release assets
-                  return "https://github.com/Chavin2543/flowerstore/releases/download/$version/your-binary-file-name";
+                  return "https://github.com/Chavin2543/flowerstore/releases/download/$version/flowerstore_installer_$version.exe";
                 },
                 appName: "FlowerStore",
                 getChangelog: (_, __) async {
                   final dio = Dio();
                   final response = await dio.get(
                       "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
-                  return jsonDecode(response.data)["body"];
+                  return response.data["body"];
                 }),
-            const DashboardScreen(),
           ],
         ),
       ),
