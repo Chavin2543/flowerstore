@@ -40,9 +40,7 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
             .map<Invoice>((json) => Invoice.fromJson(json))
             .toList();
       }
-
-      throw APIError(
-          'Failed to fetch invoices. Status code: ${response.statusCode}');
+      throw APIError('Failed to fetch invoices. Status code: ${response.statusCode}');
     } catch (error) {
       throw ErrorManager.handleAPIError(error);
     }
@@ -179,8 +177,14 @@ class InvoiceDataSourceImpl implements InvoiceDataSource {
       throw APIError(
           'POST request failed. Status code: ${response.statusCode}');
     }
-
-    return Invoice.fromJson(response.data['invoice']).id;
+    try {
+      return Invoice.fromJson(response.data['invoice']).id;
+    } on Error catch (error) {
+      print(error);
+      throw APIError(
+          'Incorrect Response'
+      );
+    }
   }
 
   @override

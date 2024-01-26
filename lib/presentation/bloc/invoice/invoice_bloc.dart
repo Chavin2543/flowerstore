@@ -80,11 +80,8 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
     try {
       final response = await _dataSource.addInvoice(event.request);
       emit(InvoiceCreated(invoiceId: response));
-
-      add(GetInvoicesEvent(request: GetInvoiceRequest(), shouldFilter: true));
     } on APIError catch (error) {
       emit(InvoiceError(message: error.message));
-
       if (cacheState is InvoiceLoaded) {
         emit(cacheState);
       } else {

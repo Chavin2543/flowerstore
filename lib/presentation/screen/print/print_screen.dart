@@ -8,14 +8,21 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:io';
-import '../../domain/entity/customer.dart';
+import '../../../domain/entity/customer.dart';
 
 class PrintScreen extends StatefulWidget {
   Customer customer;
+  int department;
+  String company;
   List<BillItem> billItems;
 
-  PrintScreen({required this.billItems, required this.customer, Key? key})
-      : super(key: key);
+  PrintScreen({
+    required this.billItems,
+    required this.customer,
+    required this.department,
+    required this.company,
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<PrintScreen> createState() => _PrintScreenState();
@@ -36,93 +43,179 @@ class _PrintScreenState extends State<PrintScreen> {
     pdfDocument = pw.Document();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    totalPages = (widget.billItems.length / 23).ceil();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('พิมพ์ใบเสร็จ'),
+      ),
+      body: FutureBuilder<Uint8List>(
+        future: _loadImageAsset(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LoadingScreen();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            return Column(
+              children: [
+                Expanded(
+                  child: FutureBuilder<pw.Document>(
+                    future: _buildPdf(snapshot.data!),
+                    builder: (context, pdfSnapshot) {
+                      if (pdfSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const LoadingScreen();
+                      } else if (pdfSnapshot.hasError) {
+                        return Text('PDF Error: ${pdfSnapshot.error}');
+                      } else if (pdfSnapshot.hasData) {
+                        return PdfPreview(
+                          build: (format) async =>
+                              await pdfSnapshot.data!.save(),
+                        );
+                      } else {
+                        return const Text('Unexpected PDF state');
+                      }
+                    },
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return const Text('Unexpected state');
+          }
+        },
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: pageIndex > 0
+                  ? () {
+                      setState(() {
+                        pageIndex--;
+                      });
+                    }
+                  : null,
+            ),
+            IconButton(
+              icon: const Icon(Icons.arrow_forward),
+              onPressed: pageIndex + 1 < totalPages
+                  ? () {
+                      setState(() {
+                        pageIndex++;
+                      });
+                    }
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Future<void> _loadFont() async {
-    final ByteData data =
-        await rootBundle.load("assets/fonts/Kanit-Regular.ttf");
+    final ByteData data = await rootBundle.load(
+      "assets/fonts/Kanit-Regular.ttf",
+    );
     final Uint8List fontBytes = data.buffer.asUint8List();
     final loadedFont = pw.Font.ttf(fontBytes.buffer.asByteData());
-
     setState(() {
       customFont = loadedFont;
     });
   }
 
   Future<Uint8List> _loadImageAsset() async {
-    final ByteData data =
-        await rootBundle.load('assets/templates/bill-template.jpeg');
+    final ByteData data = await rootBundle.load(
+      'assets/templates/bill-template.png',
+    );
     final buffer = data.buffer.asUint8List();
     return buffer;
   }
 
   Future<pw.Document> _buildPdf(Uint8List imageBytes) async {
-    totalPages = (widget.billItems.length / 23).ceil();
     final pw.Document doc = pw.Document();
     doc.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: PdfPageFormat.a4.applyMargin(left: 0, top: 0, right: 0, bottom: 0),
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              // pw.Image(pw.MemoryImage(imageBytes)),
+              pw.Image(
+                pw.MemoryImage(imageBytes),
+              ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
-                    maxWidth: 50, // Max width for the text
-                    maxHeight: 10, // Max height for the text
+                    maxWidth: 50,
+                    maxHeight: 10,
                   ),
                   child: pw.Text(
                     "${pageIndex + 1}/$totalPages ${widget.customer.name}",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 91,
-                // position where you want to start your text or content
-                left: 422,
+                top: 38,
+                left: 410,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
-                    maxWidth: 200, // Max width for the text
-                    maxHeight: 50, // Max height for the text
+                    maxWidth: 200,
+                    maxHeight: 50,
                   ),
                   child: pw.Text(
-                    widget.customer.address,
+                    "แผนก ${widget.department}, ${widget.customer.address}",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 168,
-                // position where you want to start your text or content
-                left: 60,
+                top: 112,
+                left: 51,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
-                    maxWidth: 130, // Max width for the text
-                    maxHeight: 10, // Maxght for the text
+                    maxWidth: 130,
+                    maxHeight: 10,
                   ),
                   child: pw.Text(
                     widget.customer.id.toString(),
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 189.5,
-                // position where you want to start your text or content
-                left: 355,
+                top: 137,
+                left: 350,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
-                    maxWidth: 130, // Max width for the text
-                    maxHeight: 10, // Max height for the text
+                    maxWidth: 130,
+                    maxHeight: 10,
                   ),
                   child: pw.Text(
                     formattedDate,
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 207,
-                // position where you want to start your text or content
-                left: 355,
+                top: 155,
+                left: 350,
+              ),
+              pw.Positioned(
+                child: pw.ConstrainedBox(
+                  constraints: const pw.BoxConstraints(
+                    maxWidth: 130,
+                    maxHeight: 10,
+                  ),
+                  child: pw.Text(
+                    "${widget.billItems.total} บาท",
+                    style: pw.TextStyle(fontSize: 8, font: customFont),
+                  ),
+                ),
+                top: 582,
+                left: 395,
               ),
               ...buildInvoiceItems()
             ],
@@ -132,12 +225,11 @@ class _PrintScreenState extends State<PrintScreen> {
     );
 
     buildInvoiceItems();
-
     return doc;
   }
 
   List<pw.Widget> buildInvoiceItems() {
-    double topPosition = 250.0;
+    double topPosition = 200.0;
     double increment = 20.0;
     List<pw.Widget> items = [];
     List<BillItem> billItems = [];
@@ -229,18 +321,6 @@ class _PrintScreenState extends State<PrintScreen> {
     return items;
   }
 
-// Function to print the PDF
-  Future<void> _printPdf() async {
-    final bytes = await _loadImageAsset();
-    final pw.Document doc = await _buildPdf(bytes);
-    final pdfFile = await doc.save();
-
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => bytes,
-      format: PdfPageFormat.a4,
-    );
-  }
-
   Future<void> savePdf() async {
     final directory = await getApplicationDocumentsDirectory();
     final path = '${directory.path}/my_generated_file.pdf';
@@ -252,78 +332,5 @@ class _PrintScreenState extends State<PrintScreen> {
 
     await file.writeAsBytes(pdfFile);
     print("PDF saved at $path");
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('พิมพ์ใบเสร็จ'),
-      ),
-      body: FutureBuilder<Uint8List>(
-        future: _loadImageAsset(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingScreen();
-          } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
-          } else if (snapshot.hasData) {
-            return Column(
-              children: [
-                Expanded(
-                  child: FutureBuilder<pw.Document>(
-                    future: _buildPdf(snapshot.data!),
-                    builder: (context, pdfSnapshot) {
-                      if (pdfSnapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const LoadingScreen();
-                      } else if (pdfSnapshot.hasError) {
-                        return Text('PDF Error: ${pdfSnapshot.error}');
-                      } else if (pdfSnapshot.hasData) {
-                        return PdfPreview(
-                          build: (format) async =>
-                              await pdfSnapshot.data!.save(),
-                        );
-                      } else {
-                        return Text('Unexpected PDF state');
-                      }
-                    },
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Text('Unexpected state');
-          }
-        },
-      ),
-      bottomNavigationBar: BottomAppBar(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: pageIndex > 0
-                  ? () {
-                      setState(() {
-                        pageIndex--;
-                      });
-                    }
-                  : null,
-            ),
-            IconButton(
-              icon: Icon(Icons.arrow_forward),
-              onPressed: pageIndex + 1 < totalPages
-                  ? () {
-                      setState(() {
-                        pageIndex++;
-                      });
-                    }
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

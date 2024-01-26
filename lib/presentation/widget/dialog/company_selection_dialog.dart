@@ -1,15 +1,7 @@
-import 'package:flowerstore/data/datasource/department/model/add_department_request.dart';
-import 'package:flowerstore/data/datasource/department/model/delete_department_request.dart';
-import 'package:flowerstore/domain/entity/department.dart';
-import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../bloc/department/department_bloc.dart';
 
 class CompanySelectionDialog extends StatefulWidget {
   final Function(String) onSelect;
-
   const CompanySelectionDialog({Key? key, required this.onSelect})
       : super(key: key);
 

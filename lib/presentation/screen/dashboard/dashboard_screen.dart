@@ -1,35 +1,30 @@
 // Flutter imports:
 import 'package:flowerstore/data/datasource/customer/model/get_customer_request.dart';
-import 'package:flowerstore/data/datasource/department/model/get_department_request.dart';
-import 'package:flowerstore/helper/customer_store.dart';
+import 'package:flowerstore/presentation/screen/dashboard/dashboard_dialog.dart';
+import 'package:flowerstore/presentation/screen/dashboard/dashboard_navigation.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 // Project imports:
 import 'package:flowerstore/base/ui/textfield/base_textfield.dart';
 import 'package:flowerstore/domain/entity/customer.dart';
 import 'package:flowerstore/presentation/bloc/customer/customer_bloc.dart';
-import 'package:flowerstore/presentation/widget/dialog/add_customer_dialog.dart';
 import 'package:flowerstore/presentation/widget/card/hotel_item_card.dart';
-import 'package:flowerstore/presentation/screen/mainmenu_screen.dart';
-import 'package:flowerstore/presentation/screen/summary_screen.dart';
 
-import '../bloc/analytic/analytic_bloc.dart';
-import '../bloc/category/category_bloc.dart';
-import '../bloc/department/department_bloc.dart';
-import '../bloc/invoice/invoice_bloc.dart';
-import '../bloc/product/product_bloc.dart';
+// Bloc
+import '../../bloc/category/category_bloc.dart';
+import '../../bloc/invoice/invoice_bloc.dart';
+import '../../bloc/product/product_bloc.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
   String? searchText;
 
   @override
@@ -46,7 +41,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         BlocListener<CustomerBloc, CustomerState>(
           listener: (context, state) {
             if (state is CustomerError) {
-              // Handle customer error state
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -60,7 +54,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         BlocListener<ProductBloc, ProductState>(
           listener: (context, state) {
             if (state is ProductError) {
-              // Handle customer error state
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -88,7 +81,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
         BlocListener<InvoiceBloc, InvoiceState>(
           listener: (context, state) {
             if (state is InvoiceError) {
-              // Handle customer error state
               showDialog(
                 context: context,
                 builder: (context) => AlertDialog(
@@ -99,7 +91,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
             }
           },
         ),
-        // Add other BlocListeners if you have more BLoCs
       ],
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.background,
@@ -107,12 +98,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
     );
   }
+}
 
+extension DashboardScreenUIBuilder on DashboardScreenState {
   Widget _buildCustomerList() {
     return BlocConsumer<CustomerBloc, CustomerState>(
       listener: (context, state) {
         if (state is CustomerAdded) {
-          _showAddedDialog();
+          showAddedDialog();
         }
       },
       builder: (context, state) {
@@ -129,7 +122,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final filteredCustomers = state.customers
         .where((customer) => customer.name.contains(searchText ?? ""))
         .toList();
-
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Column(
@@ -146,7 +138,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               itemBuilder: (context, index) => HotelItemCard(
                 name: filteredCustomers[index].name,
                 location: filteredCustomers[index].address,
-                onTap: () => _navigateToMainMenu(filteredCustomers[index]),
+                onTap: () => navigateToMainMenu(filteredCustomers[index]),
               ),
             ),
           ),
@@ -174,10 +166,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                _buildActionButton("เพิ่มลูกค้า", _openAddCustomerDialog),
+                _buildActionButton("เพิ่มลูกค้า", openAddCustomerDialog),
                 const SizedBox(width: 12),
                 _buildActionButton(
-                    "สรุปผล", () => _navigateToSummaryScreen(customers)),
+                    "สรุปผล", () => navigateToSummaryScreen(customers)),
               ],
             ),
           ),
@@ -201,85 +193,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
           style: Theme.of(context).textTheme.bodyLarge,
         ),
       ),
-    );
-  }
-
-  void _openAddCustomerDialog() {
-    showDialog(
-      context: context,
-      builder: (dialogContext) => AddCustomerDialog(
-        onSubmit: (request) => BlocProvider.of<CustomerBloc>(context)
-            .add(AddCustomerEvent(request: request)),
-      ),
-    );
-  }
-
-  void _navigateToSummaryScreen(List<Customer> customers) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (navigatorContext) => MultiBlocProvider(
-          providers: [
-            BlocProvider.value(value: BlocProvider.of<CustomerBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<ProductBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
-          ],
-          child: SummaryScreen(
-            customer: customers,
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _navigateToMainMenu(Customer customer) {
-    CustomerStore.setCustomerId(customer.id);
-    CustomerStore.setCustomerName(customer.name);
-
-    BlocProvider.of<DepartmentBloc>(context).add(
-      GetDepartmentEvent(
-        request: const GetDepartmentRequest(),
-      ),
-    );
-
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (navigatorContext) => MultiBlocProvider(
-          providers: [
-            BlocProvider.value(value: BlocProvider.of<CustomerBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<ProductBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<CategoryBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<InvoiceBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<AnalyticBloc>(context)),
-            BlocProvider.value(value: BlocProvider.of<DepartmentBloc>(context)),
-          ],
-          child: MainMenuScreen(customer: customer),
-        ),
-      ),
-    );
-  }
-
-  void _showAddedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('สำเร็จ'),
-          // You can change this to match your message title
-          content: const Text('ลูกค้าถูกเพิ่ม'),
-          // Message you want to show
-          actions: <Widget>[
-            TextButton(
-              child: const Text('ตกลง'),
-              onPressed: () {
-                Navigator.of(context).pop(); // Dismiss the dialog
-              },
-            ),
-          ],
-        );
-      },
     );
   }
 }

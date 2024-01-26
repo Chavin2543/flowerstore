@@ -17,9 +17,13 @@ class AddInvoiceRequest {
   Map<String, dynamic> toJson() {
     return {
       'date': date.toIso8601String(),
-      'total': '' + total.toString(),
+      'total': 0.00,
       'customer_id': customerId,
       'invoice_id': invoiceId,
+      'discount' : 0.00,
+      'discounted_total' : 0.00,
+      'biller': "",
+      'department_id': 0
     };
   }
 }

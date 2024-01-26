@@ -1,9 +1,13 @@
 class Invoice {
   int id;
-  DateTime date;
-  String total;
+  int departmentId;
   int customerId;
-  int? invoiceId;
+  int invoiceId;
+  DateTime date;
+  double total;
+  double discount;
+  double discountedTotal;
+  String biller;
 
   Invoice({
     required this.id,
@@ -11,6 +15,10 @@ class Invoice {
     required this.total,
     required this.customerId,
     required this.invoiceId,
+    required this.discount,
+    required this.discountedTotal,
+    required this.biller,
+    required this.departmentId,
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -18,10 +26,18 @@ class Invoice {
 
     return Invoice(
       id: json['id'],
-      total: json['total'],
+      total: _toDouble(json['total']),
       date: date,
       customerId: json['customer_id'],
       invoiceId: json['invoice_id'],
+      discountedTotal: _toDouble(json['discounted_total']),
+      discount: _toDouble(json['discount']),
+      biller: json['biller'],
+      departmentId: json['department_id'],
     );
+  }
+
+  static double _toDouble(dynamic value) {
+    return (value as num).toDouble();
   }
 }

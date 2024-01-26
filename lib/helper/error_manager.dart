@@ -4,7 +4,6 @@ import 'package:flowerstore/data/api_error.dart';
 class ErrorManager {
   static APIError handleAPIError(dynamic error) {
     if (error is DioException) {
-      print(error);
       if (error.type == DioExceptionType.connectionTimeout ||
           error.type == DioExceptionType.sendTimeout ||
           error.type == DioExceptionType.receiveTimeout) {

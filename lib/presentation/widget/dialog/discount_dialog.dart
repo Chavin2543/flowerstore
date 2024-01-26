@@ -1,22 +1,53 @@
 import 'package:flutter/material.dart';
 
+class DiscountResult {
+  final double discount;
+  final double discountedTotal;
+
+  DiscountResult({required this.discount, required this.discountedTotal});
+}
+
 class DiscountDialog extends StatefulWidget {
   final double total;
-  final Function(double) onSubmit;
+  final double oldDiscount;
+  final Function(DiscountResult) onSubmit;
 
   const DiscountDialog({
     Key? key,
     required this.total,
+    this.oldDiscount = 0.0,
     required this.onSubmit,
   }) : super(key: key);
 
   @override
-  _DiscountDialogState createState() => _DiscountDialogState();
+  DiscountDialogState createState() => DiscountDialogState();
 }
 
-class _DiscountDialogState extends State<DiscountDialog> {
+class DiscountDialogState extends State<DiscountDialog> {
   TextEditingController discountController = TextEditingController();
-  DiscountType _discountType = DiscountType.percent; // default to percent
+  DiscountType _discountType = DiscountType.percent;
+
+  void _submitDiscount() {
+    if (discountController.text.isNotEmpty) {
+      double discountValue = double.parse(discountController.text);
+      double discountedTotal = widget.total;
+
+      if (_discountType == DiscountType.percent) {
+        discountValue = widget.total * discountValue / 100;
+        discountedTotal -= discountValue;
+      } else {
+        discountedTotal -= discountValue;
+      }
+      widget.onSubmit(DiscountResult(
+          discount: discountValue, discountedTotal: discountedTotal));
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    discountController.text = widget.oldDiscount.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +61,7 @@ class _DiscountDialogState extends State<DiscountDialog> {
               decoration: const InputDecoration(
                 labelText: 'ส่วนลด',
               ),
-              keyboardType: TextInputType.number, // only allow number inputs
+              keyboardType: TextInputType.number,
             ),
             ValueListenableBuilder(
               valueListenable: discountController,
@@ -71,18 +102,6 @@ class _DiscountDialogState extends State<DiscountDialog> {
                 },
               ),
             ),
-            ListTile(
-              title: const Text('จำนวนเงิน'),
-              leading: Radio<DiscountType>(
-                value: DiscountType.amount,
-                groupValue: _discountType,
-                onChanged: (DiscountType? value) {
-                  setState(() {
-                    _discountType = value!;
-                  });
-                },
-              ),
-            ),
           ],
         ),
       ),
@@ -91,18 +110,17 @@ class _DiscountDialogState extends State<DiscountDialog> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('ยกเลิก'),
+          child: Text(
+            'ยกเลิก',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
         TextButton(
-          onPressed: () {
-            if (discountController.text.isNotEmpty) {
-              widget.onSubmit(
-                double.parse(discountController.text),
-              );
-              Navigator.of(context).pop();
-            }
-          },
-          child: const Text('ออกบิล'),
+          onPressed: _submitDiscount,
+          child: Text(
+            'ออกบิล',
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
         ),
       ],
     );

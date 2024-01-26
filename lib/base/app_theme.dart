@@ -4,21 +4,27 @@ class AppTheme {
   static final ThemeData lightTheme = ThemeData(
     brightness: Brightness.light,
     primaryColor: const Color(0xFFFFFAF4),
+    inputDecorationTheme: const InputDecorationTheme(
+      labelStyle: TextStyle(color: Colors.grey),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey, width: 2.0),
+      ),
+    ),
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
       primary: Color(0xFFFFFAF4),
       onPrimary: Colors.black,
-      secondary: Color(0xFFE6CFB4),
+      secondary: Colors.grey,
       onSecondary: Colors.black,
       error: Colors.red,
       onError: Colors.white,
       background: Colors.white,
       onBackground: Colors.black,
-      surface: Color(0xFFE6CFB4),
+      surface: Colors.grey,
       onSurface: Colors.black,
     ),
-    highlightColor: const Color(0xFFFFDEB4),
-    splashColor: const Color(0xFFFDF7C3),
+    highlightColor: Colors.grey,
+    splashColor: Colors.grey,
     textTheme: const TextTheme(
       displayLarge: TextStyle(
         fontSize: 28.0,

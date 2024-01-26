@@ -33,59 +33,6 @@ class SummaryScreenState extends State<SummaryScreen> {
         .add(GetAnalyticsEvent(request: GetInvoiceRequest()));
   }
 
-  void _calculateTotals(List<Invoice> invoices) {
-    filteredInvoices = invoices.where((invoice) {
-      return invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
-          invoice.date.isBefore(endDate.add(const Duration(days: 1)));
-    }).toList();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      setState(() {});
-    });
-  }
-
-  Map<String, double> calculateCompanyTotalsStringKey(List<Invoice> invoices) {
-    final Map<String, double> companyTotals = {};
-
-    for (final invoice in invoices) {
-      final total = double.parse(invoice.total);
-      final customer = widget.customer.firstWhere(
-              (element) => element.id == invoice.customerId,
-          orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '') // Replace with a suitable default customer
-      );
-
-      final name = customer.name;
-
-      if (companyTotals.containsKey(name)) {
-        companyTotals[name] = companyTotals[name]! + total;
-      } else {
-        companyTotals[name] = total;
-      }
-    }
-
-    return companyTotals;
-  }
-
-  double _calculateTotalWithinRange(List<Invoice> invoices) {
-    double total = 0.0;
-    for (var invoice in invoices) {
-      total += double.tryParse(invoice.total) ?? 0.0;
-    }
-    return total;
-  }
-
-  Map<DateTime, double> _aggregateTotalsByMonth(List<Invoice> invoices) {
-    Map<DateTime, double> monthlyTotals = {};
-    for (var invoice in invoices) {
-      if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
-          invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
-        DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
-        double total = double.tryParse(invoice.total) ?? 0;
-        monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
-      }
-    }
-    return monthlyTotals;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,11 +91,61 @@ class SummaryScreenState extends State<SummaryScreen> {
       ),
     );
   }
+}
+
+extension SummaryScreenCalculations on SummaryScreenState {
+  void _calculateTotals(List<Invoice> invoices) {
+    filteredInvoices = invoices.where((invoice) {
+      return invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)));
+    }).toList();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      setState(() {});
+    });
+  }
+
+  Map<String, double> calculateCompanyTotalsStringKey(List<Invoice> invoices) {
+    final Map<String, double> companyTotals = {};
+    for (final invoice in invoices) {
+      final total = invoice.total;
+      final customer = widget.customer.firstWhere(
+              (element) => element.id == invoice.customerId,
+          orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '')
+      );
+      final name = customer.name;
+      if (companyTotals.containsKey(name)) {
+        companyTotals[name] = companyTotals[name]! + total;
+      } else {
+        companyTotals[name] = total;
+      }
+    }
+    return companyTotals;
+  }
+
+  double _calculateTotalWithinRange(List<Invoice> invoices) {
+    double total = 0.0;
+    for (var invoice in invoices) {
+      total += invoice.total;
+    }
+    return total;
+  }
+
+  Map<DateTime, double> _aggregateTotalsByMonth(List<Invoice> invoices) {
+    Map<DateTime, double> monthlyTotals = {};
+    for (var invoice in invoices) {
+      if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
+        DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
+        double total = invoice.total;
+        monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
+      }
+    }
+    return monthlyTotals;
+  }
+
 
   String formatDateTimeToThaiDate(DateTime dateTime) {
-    // Format the input DateTime object to Thai date format
     String formattedDate = DateFormat('d MMM yy', 'th').format(dateTime);
-
     return formattedDate;
   }
 }
