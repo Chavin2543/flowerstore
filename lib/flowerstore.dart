@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flowerstore/base/app_theme.dart';
@@ -15,6 +16,16 @@ import 'package:flowerstore/base/dependency_injector.dart' as di;
 import 'package:updat/updat.dart';
 import 'dart:convert';
 
+class NoThumbScrollBehavior extends ScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.trackpad,
+  };
+}
+
 class FlowerStore extends StatelessWidget {
   const FlowerStore({required this.version, Key? key}) : super(key: key);
 
@@ -25,6 +36,7 @@ class FlowerStore extends StatelessWidget {
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
+      scrollBehavior: NoThumbScrollBehavior().copyWith(scrollbars: false),
       home: MultiBlocProvider(
         providers: [
           BlocProvider<CustomerBloc>(
@@ -50,28 +62,30 @@ class FlowerStore extends StatelessWidget {
           children: [
             const DashboardScreen(),
             UpdatWidget(
-                currentVersion: version,
-                getLatestVersion: () async {
-                  final dio = Dio();
-                  final response = await dio.get(
-                      "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
-                  try {
-                    final tagName = response.data["tag_name"];
-                    return tagName;
-                  } on Error catch (error) {
-                    print(error);
-                  }
-                },
-                getBinaryUrl: (version) async {
-                  return "https://github.com/Chavin2543/flowerstore/releases/download/$version/flowerstore_installer_$version.exe";
-                },
-                appName: "FlowerStore",
-                getChangelog: (_, __) async {
-                  final dio = Dio();
-                  final response = await dio.get(
-                      "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
-                  return response.data["body"];
-                }),
+              currentVersion: version,
+              getLatestVersion: () async {
+                final dio = Dio();
+                final response = await dio.get(
+                    "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
+                try {
+                  final tagName = response.data["tag_name"];
+                  return tagName;
+                } on Error catch (error) {
+                  print(error);
+                }
+              },
+              getBinaryUrl: (version) async {
+                return "https://github.com/Chavin2543/flowerstore/releases/download/$version/flowerstore_installer_$version.exe";
+              },
+              appName: "FlowerStore",
+              getChangelog: (_, __) async {
+                final dio = Dio();
+                final response = await dio.get(
+                    "https://api.github.com/repos/Chavin2543/flowerstore/releases/latest");
+                return response.data["body"];
+              },
+              closeOnInstall: true,
+            ),
           ],
         ),
       ),

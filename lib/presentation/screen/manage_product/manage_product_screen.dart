@@ -75,67 +75,73 @@ class ManageProductScreenState extends State<ManageProductScreen> {
                       if (state is CategoriesLoaded) {
                         return Column(
                           children: [
-                            TextField(
-                              decoration: InputDecoration(
-                                prefixIcon: const Icon(Icons.search),
-                                hintText: "ค้นหาหมวดหมู่",
-                                hintStyle:
-                                    Theme.of(context).textTheme.bodyLarge,
+                            SizedBox(
+                              height: proxy.maxHeight * 0.05,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  prefixIcon: const Icon(Icons.search),
+                                  hintText: "ค้นหาหมวดหมู่",
+                                  hintStyle:
+                                  Theme.of(context).textTheme.bodyLarge,
+                                ),
+                                controller: _categorySearchController,
+                                onChanged: (text) {
+                                  BlocProvider.of<CategoryBloc>(context).add(
+                                    QueryCategoryEvent(
+                                      text,
+                                    ),
+                                  );
+                                },
                               ),
-                              controller: _categorySearchController,
-                              onChanged: (text) {
-                                BlocProvider.of<CategoryBloc>(context).add(
-                                  QueryCategoryEvent(
-                                    text,
-                                  ),
-                                );
-                              },
                             ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemBuilder: (context, position) {
-                                return ManageCategoryItem(
-                                  state.categories[position],
-                                  () {
-                                    final category = state.categories[position];
-                                    BlocProvider.of<CategoryBloc>(context).add(
-                                      DeleteCategoryEvent(
-                                        DeleteCategoryRequest(
-                                            categoryId: category.id),
-                                      ),
-                                    );
-                                  },
-                                  () {
-                                    showCategoryEditDialog(
-                                        state.categories[position]);
-                                  },
-                                  (Category category) {
-                                    setState(() {
-                                      if (selectedCategory == category.id) {
-                                        selectedCategory = null;
-                                        BlocProvider.of<ProductBloc>(context)
-                                            .add(GetProductEvent(
-                                                request: GetProductRequest()));
-                                        BlocProvider.of<CategoryBloc>(context)
-                                            .add(GetCategoriesEvent(
-                                                request:
-                                                    const GetCategoryRequest()));
-                                      } else {
-                                        selectedCategory = category.id;
-                                        BlocProvider.of<ProductBloc>(context)
-                                            .add(
-                                          QueryProductByCategoryEvent(
-                                            category.id,
-                                          ),
-                                        );
-                                      }
-                                    });
-                                  },
-                                  selectedCategory ==
-                                      state.categories[position].id,
-                                );
-                              },
-                              itemCount: state.categories.length,
+                            SizedBox(
+                              height: proxy.maxHeight * 0.95,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemBuilder: (context, position) {
+                                  return ManageCategoryItem(
+                                    state.categories[position],
+                                        () {
+                                      final category = state.categories[position];
+                                      BlocProvider.of<CategoryBloc>(context).add(
+                                        DeleteCategoryEvent(
+                                          DeleteCategoryRequest(
+                                              categoryId: category.id),
+                                        ),
+                                      );
+                                    },
+                                        () {
+                                      showCategoryEditDialog(
+                                          state.categories[position]);
+                                    },
+                                        (Category category) {
+                                      setState(() {
+                                        if (selectedCategory == category.id) {
+                                          selectedCategory = null;
+                                          BlocProvider.of<ProductBloc>(context)
+                                              .add(GetProductEvent(
+                                              request: GetProductRequest()));
+                                          BlocProvider.of<CategoryBloc>(context)
+                                              .add(GetCategoriesEvent(
+                                              request:
+                                              const GetCategoryRequest()));
+                                        } else {
+                                          selectedCategory = category.id;
+                                          BlocProvider.of<ProductBloc>(context)
+                                              .add(
+                                            QueryProductByCategoryEvent(
+                                              category.id,
+                                            ),
+                                          );
+                                        }
+                                      });
+                                    },
+                                    selectedCategory ==
+                                        state.categories[position].id,
+                                  );
+                                },
+                                itemCount: state.categories.length,
+                              ),
                             ),
                           ],
                         );
@@ -154,6 +160,7 @@ class ManageProductScreenState extends State<ManageProductScreen> {
                         return Column(
                           children: [
                             Container(
+                              height: proxy.maxHeight * 0.05,
                               color: Theme.of(context).colorScheme.surface,
                               child: TextField(
                                 decoration: InputDecoration(
@@ -169,28 +176,31 @@ class ManageProductScreenState extends State<ManageProductScreen> {
                                 },
                               ),
                             ),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemBuilder: (context, position) {
-                                return ManageProductItem(
-                                  state.products[position],
-                                  () {
-                                    final product = state.products[position];
-                                    BlocProvider.of<ProductBloc>(context).add(
-                                      DeleteProductEvent(
-                                        request: DeleteProductRequest(
-                                            id: product.id,
-                                            customerId: product.customerId),
-                                      ),
-                                    );
-                                  },
-                                  () {
-                                    showProductEditDialog(
-                                        state.products[position]);
-                                  },
-                                );
-                              },
-                              itemCount: state.products.length,
+                            SizedBox(
+                              height: proxy.maxHeight * 0.95,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemBuilder: (context, position) {
+                                  return ManageProductItem(
+                                    state.products[position],
+                                        () {
+                                      final product = state.products[position];
+                                      BlocProvider.of<ProductBloc>(context).add(
+                                        DeleteProductEvent(
+                                          request: DeleteProductRequest(
+                                              id: product.id,
+                                              customerId: product.customerId),
+                                        ),
+                                      );
+                                    },
+                                        () {
+                                      showProductEditDialog(
+                                          state.products[position]);
+                                    },
+                                  );
+                                },
+                                itemCount: state.products.length,
+                              ),
                             ),
                           ],
                         );

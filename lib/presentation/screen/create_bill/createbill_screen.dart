@@ -118,8 +118,8 @@ class CreateBillScreenState extends State<CreateBillScreen> {
 }
 
 extension CreateBillNavigation on CreateBillScreenState {
-  void _navigateToPrintScreen(int selectedDepartment, String selectedCompany,
-      DiscountResult discount) {
+  void _navigateToPrintScreen(
+      int selectedDepartment, String selectedCompany, DiscountResult discount) {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
     final invoiceId = currentInvoiceId;
@@ -399,12 +399,11 @@ extension CreateBillAction on CreateBillScreenState {
 
   void _handleContinue() async {
     final discount = await showDiscountDialog();
+    if (discount == null) return;
     final selectedDepartment = await showDepartmentSelectionDialog();
+    if (selectedDepartment == null) return;
     final selectedCompany = await showCompanySelectionDialog();
-    if (selectedDepartment != null &&
-        selectedCompany != null &&
-        discount != null) {
-      _navigateToPrintScreen(selectedDepartment, selectedCompany, discount);
-    }
+    if (selectedCompany == null) return;
+    _navigateToPrintScreen(selectedDepartment, selectedCompany, discount);
   }
 }

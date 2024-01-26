@@ -57,6 +57,7 @@ class DiscountDialogState extends State<DiscountDialog> {
         child: Column(
           children: [
             TextField(
+              autofocus: true,
               controller: discountController,
               decoration: const InputDecoration(
                 labelText: 'ส่วนลด',

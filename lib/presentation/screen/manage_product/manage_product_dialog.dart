@@ -37,7 +37,6 @@ extension ManageProductScreenDialogs on ManageProductScreenState {
                 ),
               );
             }
-            Navigator.pop(context);
           },
           title: "แก้ไขสินค้า",
           input1Placeholder: "ชื่อ",
@@ -69,7 +68,6 @@ extension ManageProductScreenDialogs on ManageProductScreenState {
                 ),
               ),
             );
-            Navigator.pop(context);
           },
           title: "แก้ไขหมวดหมู่",
           input1Placeholder: "ชื่อหมวดหมู่",

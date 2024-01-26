@@ -12,7 +12,7 @@ class AppTheme {
     ),
     colorScheme: const ColorScheme(
       brightness: Brightness.light,
-      primary: Color(0xFFFFFAF4),
+      primary: Color(0xffe0ccbe),
       onPrimary: Colors.black,
       secondary: Colors.grey,
       onSecondary: Colors.black,
