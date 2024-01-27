@@ -153,18 +153,14 @@ class _PrintScreenState extends State<PrintScreen> {
     final pw.Document doc = pw.Document();
     doc.addPage(
       pw.Page(
-        pageFormat: PdfPageFormat.a4.applyMargin(
-          left: 0,
-          top: 0,
-          right: 0,
-          bottom: 0,
+        pageFormat: const PdfPageFormat(
+            576,
+            792,
+            marginAll: 0
         ),
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              pw.Image(
-                pw.MemoryImage(imageBytes),
-              ),
               pw.Positioned(
                 child: pw.Container(
                     color: PdfColor.fromHex("#B2BEB5"),
@@ -179,7 +175,7 @@ class _PrintScreenState extends State<PrintScreen> {
                       ),
                     )),
                 top: 18,
-                left: 430,
+                right: 0
               ),
               pw.Positioned(
                 child: pw.Container(
@@ -210,8 +206,8 @@ class _PrintScreenState extends State<PrintScreen> {
                         style: pw.TextStyle(fontSize: 8, font: customFont),
                       ),
                     )),
-                top: 110,
-                left: 385,
+                top: 158.4,
+                right: 158.4,
               ),
               pw.Positioned(
                 child: pw.Container(
@@ -226,8 +222,8 @@ class _PrintScreenState extends State<PrintScreen> {
                         style: pw.TextStyle(fontSize: 8, font: customFont),
                       ),
                     )),
-                top: 135,
-                left: 385,
+                top: 194.4,
+                right: 158.4,
               ),
               pw.Positioned(
                 child: pw.Container(
