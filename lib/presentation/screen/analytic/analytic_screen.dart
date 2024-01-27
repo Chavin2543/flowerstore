@@ -84,7 +84,23 @@ extension AnalyticScreenBuilder on AnalyticScreenState {
 
   Widget buildSummaryList(List<Invoice> invoices) {
     Map<DateTime, double> totals = aggregateTotalsByMonth(invoices);
+    Map<DateTime, double> discountedTotals = aggregateDiscountedTotalsByMonth(invoices);
+    Map<DateTime, double> discounts = aggregateDiscountsByMonth(invoices);
     double totalWithinRange = calculateTotalWithinRange(
+      invoices,
+      startYear,
+      startMonth,
+      endYear,
+      endMonth,
+    );
+    double discountedTotalWithinRange = calculateDiscountedTotalWithinRange(
+      invoices,
+      startYear,
+      startMonth,
+      endYear,
+      endMonth,
+    );
+    double discountWithinRange = calculateDiscountWithinRange(
       invoices,
       startYear,
       startMonth,
@@ -98,7 +114,7 @@ extension AnalyticScreenBuilder on AnalyticScreenState {
           Row(
             children: [
               Text(
-                'ยอดรวมจาก $startMonth/$startYear ถึง $endMonth/$endYear: $totalWithinRange บาท',
+                'ยอดรวมจาก $startMonth/$startYear ถึง $endMonth/$endYear: $totalWithinRange บาท ส่วนลด $discountWithinRange ยอดสุทธิ $discountedTotalWithinRange',
                 style: Theme.of(context).textTheme.displayLarge,
                 textAlign: TextAlign.left,
               )
@@ -107,11 +123,15 @@ extension AnalyticScreenBuilder on AnalyticScreenState {
           Expanded(
             child: MonthSummaryListItem(
               totals: totals,
+              discountedTotals: discountedTotals,
+              discounts: discounts,
             ),
           ),
           Expanded(
             child: BarChartSummary(
               totals: totals,
+              discounts: discounts,
+              discountedTotals: discountedTotals,
             ),
           ),
         ],

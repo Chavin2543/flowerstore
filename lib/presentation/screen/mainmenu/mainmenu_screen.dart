@@ -53,7 +53,7 @@ class MainMenuScreen extends StatelessWidget {
                 _buildMenuItem(
                     context,
                     MainMenuType.createBill,
-                    () async => navigateToCreateBillScreen(
+                    () async => openCreateBillConfirmationDialog(
                         context,
                         await BlocProvider.of<InvoiceBloc>(context)
                             .generateInvoiceId()),

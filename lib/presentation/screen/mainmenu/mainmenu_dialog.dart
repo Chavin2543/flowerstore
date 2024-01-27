@@ -1,3 +1,4 @@
+import 'package:flowerstore/presentation/screen/mainmenu/mainmenu_navigation.dart';
 import 'package:flowerstore/presentation/screen/mainmenu/mainmenu_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -42,6 +43,24 @@ extension MainMenuDialog on MainMenuScreen {
           primaryButtonTitle: "แก้ไข",
           secondaryButtonTitle: "ยกเลิก",
           autoFocusPosition: ThreeAutoFocusPosition.one,
+        );
+      },
+    );
+  }
+
+  void openCreateBillConfirmationDialog(BuildContext context, int displayedInvoiceId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return CoreConfirmDialog(
+          message: "ต้องการสร้างบิลที่ $displayedInvoiceId \nของ ${CustomerStore.getCustomerName()} \nต้องการยืนยันหรือไม่?",
+          onConfirm: () {
+            Navigator.pop(context);
+            navigateToCreateBillScreen(context, displayedInvoiceId);
+          },
+          primaryButtonTitle: "สร้าง",
+          secondaryButtonTitle: "ยกเลิก",
+          title: "สร้างบิล",
         );
       },
     );

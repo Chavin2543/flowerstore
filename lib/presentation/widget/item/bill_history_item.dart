@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../domain/entity/department.dart';
 import '../../../domain/entity/invoice.dart';
 
 class BillHistoryItem extends StatefulWidget {
@@ -39,7 +40,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 5,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
                       widget.invoice.invoiceId.toString(),
                         style: Theme.of(context).textTheme.bodyLarge
@@ -49,7 +50,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 5,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
                       formattedDate,
                         style: Theme.of(context).textTheme.bodyLarge
@@ -59,19 +60,9 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                     height: 60.0,  // Height is set
                     alignment: Alignment.center,  // <-- Added alignment
                     decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 5,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
-                      widget.invoice.discountedTotal.toString(),
-                        style: Theme.of(context).textTheme.bodyLarge
-                    ),
-                  ),
-                  Container(
-                    height: 60.0,  // Height is set
-                    alignment: Alignment.center,  // <-- Added alignment
-                    decoration: BoxDecoration(border: Border.all()),
-                    width: boxConstraints.maxWidth / 5,
-                    child: Text(
-                        widget.invoice.biller,
+                        widget.invoice.biller.isEmpty ? "ไม่ระบุ" : widget.invoice.biller,
                         style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
@@ -81,9 +72,9 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                         height: 60.0,  // Height is set
                         alignment: Alignment.center,  // <-- Added alignment
                         decoration: BoxDecoration(border: Border.all()),
-                        width: boxConstraints.maxWidth / 5,
+                        width: boxConstraints.maxWidth / 7,
                         child: Text(
-                            state.departments.firstWhere((element) => element.id == widget.invoice.departmentId).name.toString(),
+                            state.departments.firstWhere((element) => element.id == widget.invoice.departmentId, orElse: () => Department(id: -99, name: "ไม่ระบุ")).name,
                             style: Theme.of(context).textTheme.bodyLarge
                         ),
                       );
@@ -92,7 +83,7 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                         height: 60.0,  // Height is set
                         alignment: Alignment.center,  // <-- Added alignment
                         decoration: BoxDecoration(border: Border.all()),
-                        width: boxConstraints.maxWidth / 5,
+                        width: boxConstraints.maxWidth / 7,
                         child: Text(
                             "ไม่ระบุ",
                             style: Theme.of(context).textTheme.bodyLarge
@@ -100,6 +91,36 @@ class _BillHistoryItemState extends State<BillHistoryItem> {
                       );
                     }
                   }),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(border: Border.all()),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        widget.invoice.total.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(border: Border.all()),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        widget.invoice.discount.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(border: Border.all()),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        widget.invoice.discountedTotal.toString(),
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
                 ],
               ),
             ),

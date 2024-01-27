@@ -3,8 +3,15 @@ import 'package:intl/intl.dart';
 
 class MonthSummaryListItem extends StatelessWidget {
   final Map<DateTime, double> totals;
+  final Map<DateTime, double> discountedTotals;
+  final Map<DateTime, double> discounts;
 
-  const MonthSummaryListItem({super.key, required this.totals});
+  const MonthSummaryListItem({
+    super.key,
+    required this.totals,
+    required this.discountedTotals,
+    required this.discounts,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,6 +21,8 @@ class MonthSummaryListItem extends StatelessWidget {
         final ValueNotifier<Color> backgroundColor = ValueNotifier(Colors.grey);
         DateTime date = totals.keys.elementAt(index);
         double total = totals[date]!;
+        double discountedTotal = discountedTotals[date]!;
+        double discount = discounts[date]!;
         String month = DateFormat('MMMM', 'th_TH').format(date);
         int year = date.year + 543;
         return Padding(
@@ -38,7 +47,7 @@ class MonthSummaryListItem extends StatelessWidget {
                       child: ListTile(
                         tileColor: Colors.transparent,
                         title: Text('เดือน: $month, ปี: $year'),
-                        subtitle: Text('ยอดรวม: $total บาท'),
+                        subtitle: Text('ยอดรวม: $total บาท ส่วนลด $discount ยอดสุทธิ $discountedTotal'),
                       ),
                     );
                   },

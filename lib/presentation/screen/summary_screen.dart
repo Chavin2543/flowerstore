@@ -70,11 +70,15 @@ class SummaryScreenState extends State<SummaryScreen> {
                           height: MediaQuery.of(context).size.height * 0.3,
                           child: InvoiceSummary(
                             totals: calculateCompanyTotalsStringKey(filteredInvoices),
+                            discountedTotals: calculateCompanyDiscountedTotalsStringKey(filteredInvoices),
+                            discounts: calculateCompanyDiscountStringKey(filteredInvoices),
                           ),
                         ),
                         Expanded(
                           child: BarChartSummary(
                             totals: _aggregateTotalsByMonth(filteredInvoices),
+                            discountedTotals: _aggregateDiscountedTotalsByMonth(filteredInvoices),
+                            discounts: _aggregateDiscountByMonth(filteredInvoices),
                           ),
                         ),
                       ],
@@ -107,6 +111,42 @@ extension SummaryScreenCalculations on SummaryScreenState {
   Map<String, double> calculateCompanyTotalsStringKey(List<Invoice> invoices) {
     final Map<String, double> companyTotals = {};
     for (final invoice in invoices) {
+      final total = invoice.total;
+      final customer = widget.customer.firstWhere(
+              (element) => element.id == invoice.customerId,
+          orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '')
+      );
+      final name = customer.name;
+      if (companyTotals.containsKey(name)) {
+        companyTotals[name] = companyTotals[name]! + total;
+      } else {
+        companyTotals[name] = total;
+      }
+    }
+    return companyTotals;
+  }
+
+  Map<String, double> calculateCompanyDiscountStringKey(List<Invoice> invoices) {
+    final Map<String, double> companyTotals = {};
+    for (final invoice in invoices) {
+      final total = invoice.discount;
+      final customer = widget.customer.firstWhere(
+              (element) => element.id == invoice.customerId,
+          orElse: () => Customer(id: -1, name: 'Unknown', phone: '', address: '')
+      );
+      final name = customer.name;
+      if (companyTotals.containsKey(name)) {
+        companyTotals[name] = companyTotals[name]! + total;
+      } else {
+        companyTotals[name] = total;
+      }
+    }
+    return companyTotals;
+  }
+
+  Map<String, double> calculateCompanyDiscountedTotalsStringKey(List<Invoice> invoices) {
+    final Map<String, double> companyTotals = {};
+    for (final invoice in invoices) {
       final total = invoice.discountedTotal;
       final customer = widget.customer.firstWhere(
               (element) => element.id == invoice.customerId,
@@ -136,6 +176,19 @@ extension SummaryScreenCalculations on SummaryScreenState {
       if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
           invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
         DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
+        double total = invoice.total;
+        monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
+      }
+    }
+    return monthlyTotals;
+  }
+
+  Map<DateTime, double> _aggregateDiscountedTotalsByMonth(List<Invoice> invoices) {
+    Map<DateTime, double> monthlyTotals = {};
+    for (var invoice in invoices) {
+      if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
+        DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
         double total = invoice.discountedTotal;
         monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
       }
@@ -143,6 +196,18 @@ extension SummaryScreenCalculations on SummaryScreenState {
     return monthlyTotals;
   }
 
+  Map<DateTime, double> _aggregateDiscountByMonth(List<Invoice> invoices) {
+    Map<DateTime, double> monthlyTotals = {};
+    for (var invoice in invoices) {
+      if (invoice.date.isAfter(startDate.subtract(const Duration(days: 1))) &&
+          invoice.date.isBefore(endDate.add(const Duration(days: 1)))) {
+        DateTime monthKey = DateTime(invoice.date.year, invoice.date.month);
+        double total = invoice.discount;
+        monthlyTotals.update(monthKey, (existingTotal) => existingTotal + total, ifAbsent: () => total);
+      }
+    }
+    return monthlyTotals;
+  }
 
   String formatDateTimeToThaiDate(DateTime dateTime) {
     String formattedDate = DateFormat('d MMM yy', 'th').format(dateTime);

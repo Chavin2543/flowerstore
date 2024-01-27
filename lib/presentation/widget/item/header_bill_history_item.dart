@@ -31,7 +31,7 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                         border: Border.all(),
                       color: Theme.of(context).colorScheme.secondary
                     ),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
                       "หมายเลขบิล",
                       style: Theme.of(context).textTheme.bodyLarge
@@ -44,7 +44,7 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                         border: Border.all(),
                         color: Theme.of(context).colorScheme.secondary
                     ),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
                       "วันที่",
                         style: Theme.of(context).textTheme.bodyLarge
@@ -57,9 +57,61 @@ class _HeaderBillHistoryItemState extends State<HeaderBillHistoryItem> {
                         border: Border.all(),
                         color: Theme.of(context).colorScheme.secondary
                     ),
-                    width: boxConstraints.maxWidth / 3,
+                    width: boxConstraints.maxWidth / 7,
                     child: Text(
-                      "ยอดรวม",
+                        "โดย",
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        "ออกให้แผนก",
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        "ยอดรวม",
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                        "ส่วนลด",
+                        style: Theme.of(context).textTheme.bodyLarge
+                    ),
+                  ),
+                  Container(
+                    height: 60.0,  // Height is set
+                    alignment: Alignment.center,  // <-- Added alignment
+                    decoration: BoxDecoration(
+                        border: Border.all(),
+                        color: Theme.of(context).colorScheme.secondary
+                    ),
+                    width: boxConstraints.maxWidth / 7,
+                    child: Text(
+                      "ยอดสุทธิ",
                         style: Theme.of(context).textTheme.bodyLarge
                     ),
                   ),
