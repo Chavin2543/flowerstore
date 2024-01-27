@@ -16,16 +16,6 @@ import 'package:flowerstore/base/dependency_injector.dart' as di;
 import 'package:updat/updat.dart';
 import 'dart:convert';
 
-class NoThumbScrollBehavior extends ScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.stylus,
-    PointerDeviceKind.trackpad,
-  };
-}
-
 class FlowerStore extends StatelessWidget {
   const FlowerStore({required this.version, Key? key}) : super(key: key);
 
@@ -36,7 +26,6 @@ class FlowerStore extends StatelessWidget {
     return MaterialApp(
       theme: AppTheme.lightTheme,
       debugShowCheckedModeBanner: false,
-      scrollBehavior: NoThumbScrollBehavior().copyWith(scrollbars: false),
       home: MultiBlocProvider(
         providers: [
           BlocProvider<CustomerBloc>(

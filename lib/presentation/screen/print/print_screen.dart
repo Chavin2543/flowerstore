@@ -1,16 +1,18 @@
+import 'dart:io';
+
 import 'package:flowerstore/data/datasource/invoice/model/request/get_invoice_request.dart';
 import 'package:flowerstore/domain/entity/bill_item.dart';
 import 'package:flowerstore/presentation/bloc/invoice/invoice_bloc.dart';
 import 'package:flowerstore/presentation/screen/loading_screen.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'dart:io';
+
 import '../../../domain/entity/customer.dart';
 
 class PrintScreen extends StatefulWidget {
@@ -148,9 +150,6 @@ class _PrintScreenState extends State<PrintScreen> {
         build: (pw.Context context) {
           return pw.Stack(
             children: [
-              pw.Image(
-                pw.MemoryImage(imageBytes),
-              ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
@@ -162,8 +161,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 38,
-                left: 410,
+                top: 18,
+                left: 430,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
@@ -171,13 +170,13 @@ class _PrintScreenState extends State<PrintScreen> {
                     maxWidth: 200,
                     maxHeight: 50,
                   ),
-                  child: pw.Text(
+                  child:pw.Text(
                     "แผนก ${widget.department}, ${widget.customer.address}",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 112,
-                left: 51,
+                top: 92,
+                left: 31,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
@@ -190,8 +189,8 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 137,
-                left: 350,
+                top: 110,
+                left: 385,
               ),
               pw.Positioned(
                 child: pw.ConstrainedBox(
@@ -204,11 +203,12 @@ class _PrintScreenState extends State<PrintScreen> {
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
                 ),
-                top: 155,
-                left: 350,
+                top: 135,
+                left: 385,
               ),
               pw.Positioned(
-                child: pw.ConstrainedBox(
+                child: pw.Container(
+                  child: pw.ConstrainedBox(
                   constraints: const pw.BoxConstraints(
                     maxWidth: 130,
                     maxHeight: 10,
@@ -217,9 +217,10 @@ class _PrintScreenState extends State<PrintScreen> {
                     "${widget.billItems.total} บาท",
                     style: pw.TextStyle(fontSize: 8, font: customFont),
                   ),
+                )
                 ),
-                top: 582,
-                left: 395,
+                top: 650,
+                left: 440,
               ),
               ...buildInvoiceItems()
             ],
@@ -257,9 +258,10 @@ class _PrintScreenState extends State<PrintScreen> {
             child: pw.Row(
               children: [
                 pw.Container(
+                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                        minWidth: 42,
+                        minWidth: 30,
                         maxWidth: 42,
                         maxHeight: 30,
                         minHeight: 30),
@@ -269,6 +271,7 @@ class _PrintScreenState extends State<PrintScreen> {
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
+                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
                         minWidth: 30,
@@ -281,6 +284,7 @@ class _PrintScreenState extends State<PrintScreen> {
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
+                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
                         minWidth: 223,
@@ -293,6 +297,7 @@ class _PrintScreenState extends State<PrintScreen> {
                 ),
                 pw.SizedBox(width: 8),
                 pw.Container(
+                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
                         minWidth: 48,
@@ -305,6 +310,7 @@ class _PrintScreenState extends State<PrintScreen> {
                 ),
                 pw.SizedBox(width: 15),
                 pw.Container(
+                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
                         minWidth: 48,
