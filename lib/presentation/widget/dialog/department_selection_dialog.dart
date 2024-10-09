@@ -8,7 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../bloc/department/department_bloc.dart';
 
 class DepartmentSelectionDialog extends StatefulWidget {
-  final Function(int) onSelect;
+  final Function(Department) onSelect;
   final int? selectedDepartment;
 
   const DepartmentSelectionDialog({
@@ -111,7 +111,7 @@ class DepartmentSelectionDialogState extends State<DepartmentSelectionDialog> {
                                   },
                                 ),
                           onTap: () {
-                            widget.onSelect(departmentId);
+                            widget.onSelect(filteredDepartments.firstWhere((element) => element.id == departmentId));
                           },
                         ),
                       );

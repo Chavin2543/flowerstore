@@ -23,6 +23,7 @@ import 'package:flowerstore/presentation/widget/section/bill_summary.dart';
 import 'package:flowerstore/presentation/screen/print/print_screen.dart';
 import 'package:flowerstore/presentation/widget/item/createbill_item.dart';
 import 'package:flowerstore/presentation/widget/section/prefill_item_section.dart';
+import '../../../domain/entity/department.dart';
 import '../../../domain/entity/invoice.dart';
 import '../../bloc/department/department_bloc.dart';
 
@@ -119,7 +120,7 @@ class CreateBillScreenState extends State<CreateBillScreen> {
 
 extension CreateBillNavigation on CreateBillScreenState {
   void _navigateToPrintScreen(
-      int selectedDepartment, String selectedCompany, DiscountResult discount) {
+      Department selectedDepartment, String selectedCompany, DiscountResult discount) {
     final customerId = CustomerStore.getCustomerId();
     final total = currentBillItems.total;
     final invoiceId = currentInvoiceId;
@@ -134,7 +135,7 @@ extension CreateBillNavigation on CreateBillScreenState {
             displayInvoiceId: widget.displayInvoiceId,
             discount: discount.discount,
             discountedTotal: discount.discountedTotal,
-            department: selectedDepartment,
+            department: selectedDepartment.id,
             biller: selectedCompany,
           ),
         ),
@@ -150,7 +151,7 @@ extension CreateBillNavigation on CreateBillScreenState {
               billItems: currentBillItems,
               customer: widget.customer,
               company: selectedCompany,
-              department: selectedDepartment,
+              department: selectedDepartment.name,
               invoiceId: widget.invoice?.invoiceId ?? 0,
               discount: discount.discount,
               discountTotal: discount.discountedTotal,
@@ -244,8 +245,8 @@ extension CreateBillDialog on CreateBillScreenState {
     );
   }
 
-  Future<int?> showDepartmentSelectionDialog() {
-    return showDialog<int>(
+  Future<Department?> showDepartmentSelectionDialog() {
+    return showDialog<Department>(
         context: context,
         builder: (navigatorContext) => MultiBlocProvider(
               providers: [
@@ -253,7 +254,7 @@ extension CreateBillDialog on CreateBillScreenState {
                     value: BlocProvider.of<DepartmentBloc>(context)),
               ],
               child: DepartmentSelectionDialog(
-                onSelect: (int department) {
+                onSelect: (Department department) {
                   Navigator.of(navigatorContext).pop(department);
                 },
                 selectedDepartment: widget.invoice?.departmentId,

@@ -13,7 +13,7 @@ import '../../widget/dialog/confirm_dialog/core_confirm_dialog.dart';
 import '../../widget/dialog/input_dialog/core_three_input_dialog.dart';
 
 extension MainMenuDialog on MainMenuScreen {
-  void openDialog(
+  void openEditCustomerDialog(
     BuildContext context,
     Customer customer,
   ) {
@@ -22,15 +22,12 @@ extension MainMenuDialog on MainMenuScreen {
       builder: (BuildContext dialogContext) {
         return CoreThreeInputDialog(
           onSubmit: (response) {
-            BlocProvider.of<CustomerBloc>(context).add(
-              PatchCustomerEvent(
-                request: PatchCustomerRequest(
-                  customerId: customer.id,
-                  name: response.input1,
-                  address: response.input2,
-                  phone: response.input3,
-                ),
-              ),
+            openEditCustomerConfirmDialog(
+              context,
+              customer,
+              response.input1,
+              response.input2,
+              response.input3,
             );
           },
           title: "แก้ไข้ข้อมูลลูกค้า",
@@ -48,12 +45,44 @@ extension MainMenuDialog on MainMenuScreen {
     );
   }
 
-  void openCreateBillConfirmationDialog(BuildContext context, int displayedInvoiceId) {
+  void openEditCustomerConfirmDialog(
+    BuildContext context,
+    Customer customer,
+    String name,
+    String address,
+    String phone,
+  ) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) => CoreConfirmDialog(
+        message: "ยืนยันการเปลี่ยนข้อมูล",
+        onConfirm: () {
+          BlocProvider.of<CustomerBloc>(context).add(
+            PatchCustomerEvent(
+              request: PatchCustomerRequest(
+                customerId: customer.id,
+                name: name,
+                address: address,
+                phone: phone,
+              ),
+            ),
+          );
+        },
+        primaryButtonTitle: "ยืนยัน",
+        secondaryButtonTitle: "ยกเลิก",
+        title: "ยืนยัน",
+      ),
+    );
+  }
+
+  void openCreateBillConfirmationDialog(
+      BuildContext context, int displayedInvoiceId) {
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
         return CoreConfirmDialog(
-          message: "ต้องการสร้างบิลที่ $displayedInvoiceId \nของ ${CustomerStore.getCustomerName()} \nต้องการยืนยันหรือไม่?",
+          message:
+              "ต้องการสร้างบิลที่ $displayedInvoiceId \nของ ${CustomerStore.getCustomerName()} \nต้องการยืนยันหรือไม่?",
           onConfirm: () {
             Navigator.pop(context);
             navigateToCreateBillScreen(context, displayedInvoiceId);
@@ -88,18 +117,6 @@ extension MainMenuDialog on MainMenuScreen {
           title: "ยืนยันการลบลูกค้า",
         );
       },
-    );
-  }
-
-  void showPatchToast(BuildContext context) {
-    Fluttertoast.showToast(
-      msg: 'ข้อมูลถูกแก้ไขแล้ว',
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      timeInSecForIosWeb: 1,
-      backgroundColor: Colors.black87,
-      textColor: Colors.white,
-      fontSize: 16.0,
     );
   }
 }

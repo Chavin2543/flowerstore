@@ -90,6 +90,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/Kanit-Thin.ttf
           weight: 400
+    - family: Cordia
+      fonts:
+        - asset: assets/fonts/CORDIA.ttf
 
 
   # To add assets to your application, add an assets section, like this:

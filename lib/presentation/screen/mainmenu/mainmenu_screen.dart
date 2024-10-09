@@ -32,8 +32,6 @@ class MainMenuScreen extends StatelessWidget {
           BlocProvider.of<CustomerBloc>(context)
               .add(GetCustomerEvent(request: GetCustomerRequest()));
           Navigator.of(context).pop();
-        } else if (state is CustomerPatched) {
-          showPatchToast(context);
         }
       },
       child: Scaffold(
@@ -71,8 +69,15 @@ class MainMenuScreen extends StatelessWidget {
                         MainMenuType.manageFlower,
                         () => navigateToManageProductScreen(context),
                         smallButtonWidth),
-                    _buildMenuItem(context, MainMenuType.editCustomer,
-                        () => openDialog(context, customer), smallButtonWidth),
+                    _buildMenuItem(
+                      context,
+                      MainMenuType.editCustomer,
+                      () => openEditCustomerDialog(
+                        context,
+                        customer,
+                      ),
+                      smallButtonWidth,
+                    ),
                   ],
                 ),
                 Column(

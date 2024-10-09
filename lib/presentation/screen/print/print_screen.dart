@@ -17,7 +17,7 @@ import '../../../domain/entity/customer.dart';
 
 class PrintScreen extends StatefulWidget {
   Customer customer;
-  int department;
+  String department;
   String company;
   List<BillItem> billItems;
   int invoiceId;
@@ -46,6 +46,8 @@ class _PrintScreenState extends State<PrintScreen> {
   int startIndex = 0;
   int pageIndex = 0;
   int totalPages = 0;
+  static const double inch = 72.0;
+  static const double cm = inch / 2.54;
 
   @override
   void initState() {
@@ -84,6 +86,13 @@ class _PrintScreenState extends State<PrintScreen> {
                         return Text('PDF Error: ${pdfSnapshot.error}');
                       } else if (pdfSnapshot.hasData) {
                         return PdfPreview(
+                          canChangePageFormat: false,
+                          canChangeOrientation: false,
+                          padding: const EdgeInsets.all(0),
+                          pageFormats: const {
+                            'ใบเสร็จ': PdfPageFormat(8 * inch, 11 * inch,
+                                marginAll: 0 * inch),
+                          },
                           build: (format) async =>
                               await pdfSnapshot.data!.save(),
                         );
@@ -132,7 +141,7 @@ class _PrintScreenState extends State<PrintScreen> {
 
   Future<void> _loadFont() async {
     final ByteData data = await rootBundle.load(
-      "assets/fonts/Kanit-Regular.ttf",
+      "assets/fonts/CORDIA.ttf",
     );
     final Uint8List fontBytes = data.buffer.asUint8List();
     final loadedFont = pw.Font.ttf(fontBytes.buffer.asByteData());
@@ -153,125 +162,158 @@ class _PrintScreenState extends State<PrintScreen> {
     final pw.Document doc = pw.Document();
     doc.addPage(
       pw.Page(
-        pageFormat: const PdfPageFormat(
-            576,
-            792,
-            marginAll: 0
-        ),
+        clip: true,
+        pageFormat: const PdfPageFormat(8.5 * inch, 11 * inch,
+            marginLeft: 0.8 * cm,
+            marginRight: 0.8 * cm,
+            marginBottom: 0,
+            marginTop: 0),
         build: (pw.Context context) {
           return pw.Stack(
             children: [
+              // pw.Image(
+              //   pw.MemoryImage(imageBytes),
+              // ),
               pw.Positioned(
                 child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
                     child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 50,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        "บิลหมายเลข ${widget.invoiceId} หน้าที่ ${pageIndex + 1}/$totalPages ${widget.customer.name}",
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 18,
-                right: 0
+                  constraints: const pw.BoxConstraints(
+                    maxWidth: 50,
+                    maxHeight: 40,
+                  ),
+                  child: pw.Text(
+                    "บิลหมายเลข ${widget.invoiceId} หน้าที่ ${pageIndex + 1}/$totalPages ${widget.customer.name}",
+                    style: pw.TextStyle(fontSize: 14, font: customFont),
+                  ),
+                )),
+                top: 1.5 * cm,
+                left: 17.6 * cm,
               ),
               pw.Positioned(
                 child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
                     child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 200,
-                        maxHeight: 50,
-                      ),
-                      child: pw.Text(
-                        "แผนก ${widget.department}, ${widget.customer.address}",
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 92,
-                left: 31,
+                        constraints: const pw.BoxConstraints(
+                          maxWidth: 4.25 * inch,
+                          maxHeight: 100,
+                        ),
+                        child: pw.Column(
+                          children: [
+                            pw.ConstrainedBox(
+                              constraints: const pw.BoxConstraints(
+                                minWidth: 4.25 * inch,
+                                maxWidth: 4.25 * inch,
+                                maxHeight: 30,
+                              ),
+                              child:  pw.Text(
+                                widget.customer.name,
+                                style:
+                                pw.TextStyle(fontSize: 18, font: customFont),
+                                textAlign: pw.TextAlign.left,
+                              ),
+                            ),
+                            pw.ConstrainedBox(
+                              constraints: const pw.BoxConstraints(
+                                minWidth: 4.25 * inch,
+                                maxWidth: 4.25 * inch,
+                                maxHeight: 30,
+                              ),
+                              child:   pw.Text(
+                                widget.customer.address,
+                                style:
+                                pw.TextStyle(fontSize: 14, font: customFont),
+                                textAlign: pw.TextAlign.left,
+                              ),
+                            ),
+                          ],
+                        ))),
+                top: 4.75 * cm,
+                left: 1.7 * cm,
               ),
               pw.Positioned(
                 child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
                     child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 130,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        widget.customer.id.toString(),
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 158.4,
-                right: 158.4,
+                  constraints: const pw.BoxConstraints(
+                    maxWidth: 2.3 * inch,
+                    maxHeight: 10,
+                  ),
+                  child: pw.Text(
+                    widget.department,
+                    style: pw.TextStyle(fontSize: 14, font: customFont),
+                  ),
+                )),
+                top: 5.7 * cm,
+                left: 14.6 * cm,
               ),
               pw.Positioned(
                 child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
                     child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 130,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        formattedDate,
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 194.4,
-                right: 158.4,
+                  constraints: const pw.BoxConstraints(
+                    maxWidth: 130,
+                    maxHeight: 10,
+                  ),
+                  child: pw.Text(
+                    formattedDate,
+                    style: pw.TextStyle(fontSize: 14, font: customFont),
+                  ),
+                )),
+                top: 6.6 * cm,
+                left: 14.6 * cm,
               ),
+              if (widget.discount != 0.00)
+                pw.Positioned(
+                  child: pw.Container(
+                      child: pw.ConstrainedBox(
+                    constraints: const pw.BoxConstraints(
+                      maxWidth: 4 * cm,
+                      minWidth: 4 * cm,
+                      maxHeight: 0.6 * cm,
+                      minHeight: 0.6 * cm,
+                    ),
+                    child: pw.Text(
+                      "SUBTOTAL : ${widget.billItems.total}",
+                      style: pw.TextStyle(fontSize: 12, font: customFont),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  )),
+                  top: 23.8 * cm,
+                  left: 15.5 * cm,
+                ),
+              if (widget.discount != 0.00)
+                pw.Positioned(
+                  child: pw.Container(
+                      child: pw.ConstrainedBox(
+                    constraints: const pw.BoxConstraints(
+                      maxWidth: 4 * cm,
+                      minWidth: 4 * cm,
+                      maxHeight: 0.4 * cm,
+                      minHeight: 0.4 * cm,
+                    ),
+                    child: pw.Text(
+                      "DISCOUNT : ${widget.discount}",
+                      style: pw.TextStyle(fontSize: 12, font: customFont),
+                      textAlign: pw.TextAlign.right,
+                    ),
+                  )),
+                  top: 24.4 * cm,
+                  left: 15.5 * cm,
+                ),
               pw.Positioned(
                 child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
                     child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 130,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        "SUBTOTAL : ${widget.billItems.total} บาท",
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 610,
-                right: 0,
-              ),
-              pw.Positioned(
-                child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
-                    child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 130,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        "DISCOUNT : ${widget.discount} บาท",
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 630,
-                right: 0,
-              ),
-              pw.Positioned(
-                child: pw.Container(
-                    color: PdfColor.fromHex("#B2BEB5"),
-                    child: pw.ConstrainedBox(
-                      constraints: const pw.BoxConstraints(
-                        maxWidth: 130,
-                        maxHeight: 10,
-                      ),
-                      child: pw.Text(
-                        "${widget.discountTotal} บาท",
-                        style: pw.TextStyle(fontSize: 8, font: customFont),
-                      ),
-                    )),
-                top: 650,
-                right: 0,
+                  constraints: const pw.BoxConstraints(
+                    maxWidth: 2.6 * cm,
+                    minWidth: 2.6 * cm,
+                    maxHeight: 0.8 * cm,
+                    minHeight: 0.8 * cm,
+                  ),
+                  child: pw.Text(
+                    "${widget.discountTotal}",
+                    style: pw.TextStyle(fontSize: 18, font: customFont),
+                    textAlign: pw.TextAlign.right,
+                  ),
+                )),
+                top: 25.0 * cm,
+                left: 16.9 * cm,
               ),
               ...buildInvoiceItems()
             ],
@@ -285,8 +327,8 @@ class _PrintScreenState extends State<PrintScreen> {
   }
 
   List<pw.Widget> buildInvoiceItems() {
-    double topPosition = 200.0;
-    double increment = 20.0;
+    double topPosition = 8.2 * cm;
+    double increment = 0.5 * cm;
     List<pw.Widget> items = [];
     List<BillItem> billItems = [];
     if (widget.billItems.length > 23) {
@@ -301,81 +343,93 @@ class _PrintScreenState extends State<PrintScreen> {
       billItems = widget.billItems;
     }
     for (var item in billItems) {
-      if (topPosition <= 700) {
+      if (topPosition <= 24.5 * cm) {
         items.add(
           pw.Positioned(
-            top: topPosition, // calculated top position
-            left: 10, // constant left position
+            top: topPosition,
+            left: 0.4 * cm,
             child: pw.Row(
               children: [
                 pw.Container(
-                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                      minWidth: 40,
-                      maxWidth: 40,
-                      maxHeight: 40,
-                      minHeight: 40,
+                      minWidth: 1.7 * cm,
+                      maxWidth: 2 * cm,
+                      maxHeight: 0.5 * cm,
+                      minHeight: 0.5 * cm,
                     ),
-                    child: pw.Text('${item.quantity}',
-                        style: pw.TextStyle(fontSize: 8, font: customFont)),
+                    child: pw.Text(
+                      '${item.quantity}',
+                      style: pw.TextStyle(fontSize: 14, font: customFont),
+                      textAlign: pw.TextAlign.center,
+                    ),
                   ),
                 ),
-                pw.SizedBox(width: 8),
+                pw.SizedBox(width: 0.35 * cm),
                 pw.Container(
-                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                      minWidth: 40,
-                      maxWidth: 40,
-                      maxHeight: 40,
-                      minHeight: 40,
+                      minWidth: 1.5 * cm,
+                      maxWidth: 1.5 * cm,
+                      maxHeight: 0.5 * cm,
+                      minHeight: 0.5 * cm,
                     ),
-                    child: pw.Text(item.product.unit,
-                        style: pw.TextStyle(
-                          fontSize: 8,
-                          font: customFont,
-                        )),
+                    child: pw.Text(
+                      item.product.unit,
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        font: customFont,
+                      ),
+                      textAlign: pw.TextAlign.center,
+                    ),
                   ),
                 ),
-                pw.SizedBox(width: 8),
+                pw.SizedBox(width: 0.35 * cm),
                 pw.Container(
-                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                      minWidth: 233,
-                      maxWidth: 233,
-                      maxHeight: 30,
-                      minHeight: 30,
+                      minWidth: 10 * cm,
+                      maxWidth: 10 * cm,
+                      maxHeight: 0.5 * cm,
+                      minHeight: 0.5 * cm,
                     ),
                     child: pw.Text(item.product.name,
-                        style: pw.TextStyle(fontSize: 8, font: customFont)),
+                        style: pw.TextStyle(fontSize: 14, font: customFont)),
                   ),
                 ),
-                pw.SizedBox(width: 8),
+                pw.SizedBox(width: 0.1 * cm),
                 pw.Container(
-                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                        minWidth: 58,
-                        maxWidth: 58,
-                        maxHeight: 30,
-                        minHeight: 30),
-                    child: pw.Text('${item.product.price}',
-                        style: pw.TextStyle(fontSize: 8, font: customFont)),
+                      minWidth: 2.2 * cm,
+                      maxWidth: 2.2 * cm,
+                      maxHeight: 0.5 * cm,
+                      minHeight: 0.5 * cm,
+                    ),
+                    child: pw.Text(
+                      '${item.product.price}',
+                      style: pw.TextStyle(
+                        fontSize: 14,
+                        font: customFont,
+                      ),
+                      textAlign: pw.TextAlign.right,
+                    ),
                   ),
                 ),
-                pw.SizedBox(width: 15),
+                pw.SizedBox(width: 0.6 * cm),
                 pw.Container(
-                  color: PdfColor.fromHex("#B2BEB5"),
                   child: pw.ConstrainedBox(
                     constraints: const pw.BoxConstraints(
-                        minWidth: 58,
-                        maxWidth: 58,
-                        maxHeight: 30,
-                        minHeight: 30),
-                    child: pw.Text('${item.product.price * item.quantity}',
-                        style: pw.TextStyle(fontSize: 8, font: customFont)),
+                      minWidth: 2.4 * cm,
+                      maxWidth: 2.6 * cm,
+                      maxHeight: 0.5 * cm,
+                      minHeight: 0.5 * cm,
+                    ),
+                    child: pw.Text(
+                      '${item.product.price * item.quantity}',
+                      style: pw.TextStyle(fontSize: 14, font: customFont),
+                      textAlign: pw.TextAlign.right,
+                    ),
                   ),
                 ),
               ],

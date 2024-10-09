@@ -56,11 +56,15 @@ class CoreThreeInputDialogState extends State<CoreThreeInputDialog> {
   TextEditingController input2Controller = TextEditingController();
   TextEditingController input3Controller = TextEditingController();
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
       String input1 = input1Controller.text;
       String input2 = input2Controller.text;
       String input3 = input3Controller.text;
+
+      Navigator.of(context).pop();
+      await Future.delayed(const Duration(milliseconds: 300));
+
       widget.onSubmit(
         CoreThreeInputResponse(
           input1: input1,
@@ -68,7 +72,6 @@ class CoreThreeInputDialogState extends State<CoreThreeInputDialog> {
           input3: input3,
         ),
       );
-      Navigator.of(context).pop();
     }
   }
 
